@@ -29,46 +29,48 @@ public class Constants {
 
     public static final class shooterConstants {
         // Flywheel Constants
-        public static final int FLYWHEEL_1_DEVICE_ID = 10;
+        public static final int FLYWHEEL_1_DEVICE_ID        = 10;
         // My (Josh) guess is that we will use 2 motors on the flywheel
-        // public static final int FLYWHEEL_2_DEVICE_ID = 10;
-        public static final double FLYWHEEL_KP = 10.0;
-        public static final double FLYWHEEL_KI = 0.0;
-        public static final double FLYWHEEL_KD = 0.0;
-        public static final double FLYWHEEL_KV = 10.0;
+        // public static final int FLYWHEEL_2_DEVICE_ID        = 10;
+        public static final double FLYWHEEL_KP              = 10.0;
+        public static final double FLYWHEEL_KI              = 0.0;
+        public static final double FLYWHEEL_KD              = 0.0;
+        public static final double FLYWHEEL_KV              = 10.0;
         public static final double FLYWHEEL_DIAMETER_METERS = 0.1016;
         public static final double BACKSPIN_DIAMETER_METERS = 0.0508;
-        public static final double BACKSPIN_GEAR_RATIO = 0.5;
-        public static final double SHOOTER_EFFICIENCY = 0.85;
+        public static final double BACKSPIN_GEAR_RATIO      = 0.5;
+        public static final double SHOOTER_EFFICIENCY       = 0.85;
 
         // Hood Constants
-        public static final int HOOD_DEVICE_ID = 13;
-        public static final double HOOD_GEAR_RATIO = 50.0;
-        public static final double MIN_HOOD_ANGLE = 25.0;
-        public static final double MAX_HOOD_ANGLE = 75.0;
-        public static final double MIN_HOOD_SOFT_LIMIT = MIN_HOOD_ANGLE / 360.0 * HOOD_GEAR_RATIO; 
-        public static final double MAX_HOOD_SOFT_LIMIT = MAX_HOOD_ANGLE / 360.0 * HOOD_GEAR_RATIO;
-        public static final double HOOD_KP = 20.0; 
-        public static final double HOOD_KI = 0.0; 
-        public static final double HOOD_KD = 0.0;
+        public static final int HOOD_DEVICE_ID          = 13;
+        public static final double HOOD_GEAR_RATIO      = 50.0;
+        public static final double MIN_HOOD_ANGLE       = 25.0;
+        public static final double MAX_HOOD_ANGLE       = 75.0;
+        public static final double MIN_HOOD_SOFT_LIMIT  = MIN_HOOD_ANGLE / 360.0 * HOOD_GEAR_RATIO; 
+        public static final double MAX_HOOD_SOFT_LIMIT  = MAX_HOOD_ANGLE / 360.0 * HOOD_GEAR_RATIO;
+        public static final double HOOD_KP              = 20.0; 
+        public static final double HOOD_KI              = 0.0; 
+        public static final double HOOD_KD              = 0.0;
 
         // Turret Constants
-        public static final int TURRET_DEVICE_ID = 14;
-        public static final double TURRET_GEAR_RATIO = 100.0;
-        public static final double MIN_TURRET_ANGLE = 0.0;
-        public static final double MAX_TURRET_ANGLE = 180.0;
-        public static final double MIN_TURRET_SOFT_LIMIT = MIN_TURRET_ANGLE / 360.0 * TURRET_GEAR_RATIO; 
-        public static final double MAX_TURRET_SOFT_LIMIT = MAX_TURRET_ANGLE / 360.0 * TURRET_GEAR_RATIO;
-        public static final double TURRET_KP = 20.0; 
-        public static final double TURRET_KI = 0.0; 
-        public static final double TURRET_KD = 0.0;
-        public static final double TURRET_MOTION_MAGIC_CRUISE_VELOCITY = 80.0;
-        public static final double TURRET_MOTION_MAGIC_ACCELERACTIION = 160.0;
+        public static final int TURRET_DEVICE_ID                        = 14;
+        public static final double TURRET_GEAR_RATIO                    = 100.0;
+        public static final double MIN_TURRET_ANGLE                     = 0.0;
+        public static final double MAX_TURRET_ANGLE                     = 180.0;
+        public static final double MIN_TURRET_SOFT_LIMIT                = MIN_TURRET_ANGLE /
+                                                                            360.0 * TURRET_GEAR_RATIO; 
+        public static final double MAX_TURRET_SOFT_LIMIT                = MAX_TURRET_ANGLE /
+                                                                            360.0 * TURRET_GEAR_RATIO;
+        public static final double TURRET_KP                            = 20.0; 
+        public static final double TURRET_KI                            = 0.0; 
+        public static final double TURRET_KD                            = 0.0;
+        public static final double TURRET_MOTION_MAGIC_CRUISE_VELOCITY  = 80.0;
+        public static final double TURRET_MOTION_MAGIC_ACCELERACTIION   = 160.0;
 
         // Feeder Constants
-        public static final int FEEDER_DEVICE_ID = 11;
-        public static final double FEEDER_RUN = 1.0;
-        public static final double FEEDER_OFF = 0.0;
+        public static final int FEEDER_DEVICE_ID    = 11;
+        public static final double FEEDER_RUN       = 1.0;
+        public static final double FEEDER_OFF       = 0.0;
 
         // Tolerances
         public static final double TURRET_PASS_TOLERANCE    = 0.05;
