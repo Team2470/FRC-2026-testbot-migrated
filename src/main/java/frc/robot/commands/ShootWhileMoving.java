@@ -5,6 +5,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.fieldConstants;
+import frc.robot.Constants.shooterConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
@@ -27,19 +29,22 @@ public class ShootWhileMoving extends Command {
     public void execute() {
         // Tolerances are different for if we are passing or shooting
         // Thought process being that we don't need to be as accurate when passing
-        double turretToleranceDegrees   = isPassing ? 0.05 : 0.01;
-        double hoodToleranceDegrees     = isPassing ? 0.05 : 0.01;
-        double toleranceRPM             = isPassing ? 600 : 50;
+        double turretToleranceDegrees   = isPassing ? shooterConstants.TURRET_PASS_TOLERANCE :
+                                                        shooterConstants.TURRET_HUB_TOLERANCE;
+        double hoodToleranceDegrees     = isPassing ? shooterConstants.HOOD_PASS_TOLERANCE :
+                                                        shooterConstants.HOOD_HUB_TOLERANCE;
+        double toleranceRPM             = isPassing ? shooterConstants.RPM_PASS_TOLERANCE :
+                                                        shooterConstants.RPM_HUB_TOLERANCE;
         Pose2d robotPose                = m_drive.getPose();
         ChassisSpeeds fieldSpeeds       = m_drive.getFieldRelativeSpeeds();
 
         // Vector math to get basic distance (without including moving)
-        Translation2d target_location   = isPassing ? new Translation2d(14.5, 1.0) : 
-                                                        new Translation2d(8.25, 4.1);
+        Translation2d target_location   = isPassing ? fieldConstants.PASS_LOCATION : 
+                                                        fieldConstants.HUB_LOCATION;
         Translation2d robotToGoal       = target_location.minus(robotPose.getTranslation());
         double physicalDistance         = robotToGoal.getNorm();
         double guessedRPM               = isPassing ? m_shooter.getPassRPM(physicalDistance) :
-                                                        m_shooter.getTargetRPM(physicalDistance);
+                                                        m_shooter.getHubRPM(physicalDistance);
         double ballExitVelocity         = m_shooter.getExpectedExitVelocity(guessedRPM);
         double guessedHoodAngle         = isPassing ? m_shooter.getPassHoodAngle(physicalDistance) : 
                                                         m_shooter.getHubHoodAngle(physicalDistance);
@@ -61,7 +66,7 @@ public class ShootWhileMoving extends Command {
         Rotation2d robotRotation        = robotPose.getRotation();
         Rotation2d turretTarget         = fieldRelativeTarget.minus(robotRotation);
         double targetRPM                = isPassing ? m_shooter.getPassRPM(virtualDistance) :
-                                                        m_shooter.getTargetRPM(virtualDistance);
+                                                        m_shooter.getHubRPM(virtualDistance);
         double targetHood               = isPassing ? m_shooter.getPassHoodAngle(virtualDistance) :
                                                         m_shooter.getHubHoodAngle(virtualDistance);
 
@@ -75,10 +80,10 @@ public class ShootWhileMoving extends Command {
         if (m_turret.isOnTarget(turretTarget, turretToleranceDegrees) 
             && m_shooter.isAtSpeed(targetRPM, toleranceRPM)
             && m_shooter.isHoodOnTarget(targetHood, hoodToleranceDegrees)) {
-            m_shooter.runFeeder(1.0); // TODO: set feeder speed
+            m_shooter.runFeeder(shooterConstants.FEEDER_RUN); // TODO: set feeder speed
         }
         else {
-            m_shooter.runFeeder(0.0); // Turn shooter off if we are not at target values
+            m_shooter.runFeeder(shooterConstants.FEEDER_OFF); // Turn shooter off if we are not at target values
         }
     }
 }
