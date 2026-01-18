@@ -44,8 +44,8 @@ public class Constants {
         // Hood Constants
         public static final int HOOD_DEVICE_ID          = 13;
         public static final double HOOD_GEAR_RATIO      = 50.0;
-        public static final double MIN_HOOD_ANGLE       = 25.0;
-        public static final double MAX_HOOD_ANGLE       = 75.0;
+        public static final double MIN_HOOD_ANGLE       = 15.0;
+        public static final double MAX_HOOD_ANGLE       = 85.0;
         public static final double MIN_HOOD_SOFT_LIMIT  = MIN_HOOD_ANGLE / 360.0 * HOOD_GEAR_RATIO; 
         public static final double MAX_HOOD_SOFT_LIMIT  = MAX_HOOD_ANGLE / 360.0 * HOOD_GEAR_RATIO;
         public static final double HOOD_KP              = 20.0; 
@@ -73,12 +73,14 @@ public class Constants {
         public static final double FEEDER_OFF       = 0.0;
 
         // Tolerances
-        public static final double TURRET_PASS_TOLERANCE    = 0.05;
-        public static final double TURRET_HUB_TOLERANCE     = 0.01;
-        public static final double HOOD_PASS_TOLERANCE      = 0.05;
-        public static final double HOOD_HUB_TOLERANCE       = 0.01;
-        public static final double RPM_PASS_TOLERANCE       = 600;
-        public static final double RPM_HUB_TOLERANCE        = 50;
+        // TODO: Run tests to determine what level of tolerance gives
+        // "the best" balance of speed and accuracy
+        public static final double TURRET_PASS_TOLERANCE    = 3.0;
+        public static final double TURRET_HUB_TOLERANCE     = 1.0;
+        public static final double HOOD_PASS_TOLERANCE      = 3.0;
+        public static final double HOOD_HUB_TOLERANCE       = 1.0;
+        public static final double RPM_PASS_TOLERANCE       = 300;
+        public static final double RPM_HUB_TOLERANCE        = 100;
 
         public static InterpolatingDoubleTreeMap HUB_RPM_MAP    = new InterpolatingDoubleTreeMap();
         public static InterpolatingDoubleTreeMap PASS_RPM_MAP   = new InterpolatingDoubleTreeMap();
@@ -86,33 +88,47 @@ public class Constants {
         public static InterpolatingDoubleTreeMap HOOD_PASS_MAP  = new InterpolatingDoubleTreeMap();
 
         public void ShooterInterpolation() {
+            // TODO: Actually test for these values.
+            // Initial values are based on using desmos Trajectory Calculator
+            // And do not reflect real-world-values
+
             // This map is for the Hood angle 
             // when we are shooting into hub
             // Distance (meters), Hood Angle (degrees)
-            HOOD_HUB_MAP.put(2.0, 65.0); 
-            HOOD_HUB_MAP.put(4.0, 45.0);
-            HOOD_HUB_MAP.put(6.0, 30.0);
+            HOOD_HUB_MAP.put(3.993, 52.000); 
+            HOOD_HUB_MAP.put(3.048, 67.000);
+            HOOD_HUB_MAP.put(2.4384, 65.000);
+            HOOD_HUB_MAP.put(1.829, 72.000);
+            HOOD_HUB_MAP.put(1.219, 80.000);
         
             // This map is for the Hood angle 
             // when we are passing into alliance zone
             // Distance (meters), Hood Angle (degrees)
-            HOOD_PASS_MAP.put(2.0, 50.0); 
-            HOOD_PASS_MAP.put(4.0, 30.0);
-            HOOD_PASS_MAP.put(6.0, 25.0);
+            HOOD_PASS_MAP.put(1.524, 40.0); 
+            HOOD_PASS_MAP.put(3.048, 30.0);
+            HOOD_PASS_MAP.put(6.096, 18.0);
+            HOOD_PASS_MAP.put(7.620, 23.0);
+            HOOD_PASS_MAP.put(9.144, 30.0);
+            HOOD_PASS_MAP.put(11.280, 35.0);
         
             // This map is for the shooter flywheel
             // when we are shooting into hub
             // Distance (meters), Flywheel Speed (RPM)
-            HUB_RPM_MAP.put(2.0, 2500.0);
-            HUB_RPM_MAP.put(4.0, 3200.0);
-            HUB_RPM_MAP.put(6.0, 4500.0);
+            HUB_RPM_MAP.put(3.993, 4247.640);
+            HUB_RPM_MAP.put(3.048, 4070.655);
+            HUB_RPM_MAP.put(2.4384, 3716.685);
+            HUB_RPM_MAP.put(1.829, 3539.700);
+            HUB_RPM_MAP.put(1.219, 3716.685);
         
             // This map is for the shooter flywheel
             // when we are passing into alliance zone
             // Distance (meters), Flywheel Speed (RPM)
-            PASS_RPM_MAP.put(5.0, 3000.0);
-            PASS_RPM_MAP.put(10.0, 4000.0);
-            PASS_RPM_MAP.put(20.0, 7500.0);
+            PASS_RPM_MAP.put(1.524, 3539.700);
+            PASS_RPM_MAP.put(3.048, 4601.610);
+            PASS_RPM_MAP.put(6.096, 6902.415);
+            PASS_RPM_MAP.put(7.620, 7079.400);
+            PASS_RPM_MAP.put(9.144, 6725.430);
+            PASS_RPM_MAP.put(11.280,7256.385);
         }
     }
 }

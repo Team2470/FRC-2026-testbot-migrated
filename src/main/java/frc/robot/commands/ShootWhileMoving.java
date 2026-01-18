@@ -33,7 +33,7 @@ public class ShootWhileMoving extends Command {
                                                         shooterConstants.TURRET_HUB_TOLERANCE;
         double hoodToleranceDegrees     = isPassing ? shooterConstants.HOOD_PASS_TOLERANCE :
                                                         shooterConstants.HOOD_HUB_TOLERANCE;
-        double toleranceRPM             = isPassing ? shooterConstants.RPM_PASS_TOLERANCE :
+        double flywheelToleranceRPM             = isPassing ? shooterConstants.RPM_PASS_TOLERANCE :
                                                         shooterConstants.RPM_HUB_TOLERANCE;
         Pose2d robotPose                = m_drive.getPose();
         ChassisSpeeds fieldSpeeds       = m_drive.getFieldRelativeSpeeds();
@@ -78,7 +78,7 @@ public class ShootWhileMoving extends Command {
         // Once Turret and shooter are at the correct set points
         // Unleash fuel into turret
         if (m_turret.isOnTarget(turretTarget, turretToleranceDegrees) 
-            && m_shooter.isAtSpeed(targetRPM, toleranceRPM)
+            && m_shooter.isAtSpeed(targetRPM, flywheelToleranceRPM)
             && m_shooter.isHoodOnTarget(targetHood, hoodToleranceDegrees)) {
             m_shooter.runFeeder(shooterConstants.FEEDER_RUN); // TODO: set feeder speed
         }
