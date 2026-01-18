@@ -7,18 +7,19 @@ import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ShooterSubsystem extends SubsystemBase {
-    private final TalonFX m_topMotor = new TalonFX(10); // Example ID
-    private final TalonFX m_feederMotor = new TalonFX(11);
-    private final VelocityVoltage m_velocityRequest = new VelocityVoltage(0);
-    private final InterpolatingDoubleTreeMap m_hubRPMMap = new InterpolatingDoubleTreeMap();
-    private final InterpolatingDoubleTreeMap m_passRPMMap = new InterpolatingDoubleTreeMap();
-    private final InterpolatingDoubleTreeMap m_hoodHubMap = new InterpolatingDoubleTreeMap();
-    private final InterpolatingDoubleTreeMap m_hoodPassMap = new InterpolatingDoubleTreeMap();
-    private static final double kWheelDiameterMeters = 0.1016; // 4 inches
-    private static final double kEfficiency = 0.75; // Tune this based on dyno/video testing
-    private final TalonFX m_hoodMotor = new TalonFX(13); 
-    private final double HOOD_GEAR_RATIO = 50.0; // Example
-    private final double HOOD_OFFSET_DEGREES = 25.0; // Physical minimum angle
+    private final TalonFX m_topMotor                        = new TalonFX(10); // Example ID
+    private final TalonFX m_feederMotor                     = new TalonFX(11);
+    private static final double kMainWheelDiameterMeters    = 0.1016;   // 4 inches
+    private static final double kTopWheelDiameterMeters     = 0.0508;   // 2 inches (Meters)
+    private static final double kTopWheelGearRatio          = 0.5;      // Figure out specific gear ratio
+    private static final double kEfficiency                 = 0.85;     // Tune this based on dyno/video testing
+    private final VelocityVoltage m_velocityRequest         = new VelocityVoltage(0);
+    private final InterpolatingDoubleTreeMap m_hubRPMMap    = new InterpolatingDoubleTreeMap();
+    private final InterpolatingDoubleTreeMap m_passRPMMap   = new InterpolatingDoubleTreeMap();
+    private final InterpolatingDoubleTreeMap m_hoodHubMap   = new InterpolatingDoubleTreeMap();
+    private final InterpolatingDoubleTreeMap m_hoodPassMap  = new InterpolatingDoubleTreeMap();
+    private final TalonFX m_hoodMotor                       = new TalonFX(13); 
+    private final double HOOD_GEAR_RATIO                    = 50.0; // Example
 
 public ShooterSubsystem() {
         TalonFXConfiguration config = new TalonFXConfiguration();
@@ -35,28 +36,37 @@ public ShooterSubsystem() {
         hoodConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
         m_hoodMotor.getConfigurator().apply(hoodConfig);
 
-        // Populate Hood map with Hood Angle Values
+        // TODO: ALL MAP VALUES SHOULD COME FROM TESTING,
+        // CURRENT VALUES ARE FILLERS AND DO NOT REPRESENT
+        // REAL WORLD DATA
+
+        // This map is for the Hood angle 
+        // when we are shooting into hub
         // Distance (meters), Hood Angle (degrees)
         m_hoodHubMap.put(2.0, 65.0); 
         m_hoodHubMap.put(4.0, 45.0);
         m_hoodHubMap.put(6.0, 30.0);
         
-        // Populate Hood map with Hood Angle Values
+        // This map is for the Hood angle 
+        // when we are passing into alliance zone
         // Distance (meters), Hood Angle (degrees)
         m_hoodPassMap.put(2.0, 50.0); 
         m_hoodPassMap.put(4.0, 30.0);
         m_hoodPassMap.put(6.0, 25.0);
         
-        // Populate Map with RPM values
+        // This map is for the shooter flywheel
+        // when we are shooting into hub
         // Distance (meters), Flywheel Speed (RPM)
         m_hubRPMMap.put(2.0, 2500.0);
         m_hubRPMMap.put(4.0, 3200.0);
         m_hubRPMMap.put(6.0, 4500.0);
         
-        // Passing Map (Flatter, faster shots)
+        // This map is for the shooter flywheel
+        // when we are passing into alliance zone
         // Distance (meters), Flywheel Speed (RPM)
         m_passRPMMap.put(5.0, 3000.0);
         m_passRPMMap.put(10.0, 4000.0);
+        m_passRPMMap.put(20.0, 7500.0);
     }
 
     public double getTargetRPM(double distance) {
@@ -64,8 +74,7 @@ public ShooterSubsystem() {
     }
 
     public double getPassRPM(double distance) {
-        // You might want a flatter trajectory for passing
-        return m_passRPMMap.get(distance); // Fixed speed or use a second LUT
+        return m_passRPMMap.get(distance);
     }
     
     public double getHubHoodAngle(double distance) {
@@ -97,21 +106,29 @@ public ShooterSubsystem() {
         // Get actual speed (Phoenix gives RPS), convert to RPM
         double currentRPM = m_topMotor.getVelocity().getValueAsDouble() * 60.0;
         
-        // Tolerance: +/- Tolerance (measured in RPM)
+        // Tolerance: Is Current RPM = Target RPM +/- Tolerance (measured in RPM)
         return Math.abs(currentRPM - targetRPM) < tolerance;
     }
 
     public boolean isHoodOnTarget(double targetDegrees, double tolerance) {
         double currentRot = m_hoodMotor.getPosition().getValueAsDouble();
         double currentDeg = (currentRot / HOOD_GEAR_RATIO) * 360.0;
+        
+        // Tolerance: Is Current Angle = Target Angle +/- Tolerance (measured in Degrees) 
         return Math.abs(currentDeg - targetDegrees) < tolerance;
     }
 
+    // Input: RPM of the main flywheel
+    // Output: Ball's velocity coming out of shooter
+    public double getExpectedExitVelocity(double mainRPM) {
+        double mainRPS = mainRPM / 60.0;
+        double topRPS = mainRPS * kTopWheelGearRatio;
 
-    public double getExpectedExitVelocity(double rpm) {
-        double rps = rpm / 60.0;
-        // v = RPS * PI * D * Efficiency
-        // We divide by 2 because it's a hooded shooter (one side is 0 m/s)
-        return (rps * Math.PI * kWheelDiameterMeters * kEfficiency) / 2.0;
+        double mainSurface = mainRPS * Math.PI * kMainWheelDiameterMeters;
+        double topSurface = topRPS * Math.PI * kTopWheelDiameterMeters;
+        
+        // The ball speed is roughly the average of the two contacting surfaces
+        // Multiplied by efficiency (slip)
+        return ((mainSurface + topSurface) / 2.0) * kEfficiency;
     }
 }
