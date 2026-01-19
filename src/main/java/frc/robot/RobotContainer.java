@@ -9,12 +9,15 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -23,6 +26,9 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
+import frc.robot.subsystems.limelightVision.LimelightHelpers;
+import frc.robot.subsystems.limelightVision.VisionApriltagSubsystem;
+import frc.robot.util.FieldObject;
 
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -39,10 +45,17 @@ public class RobotContainer {
 
     private final CommandXboxController joystick = new CommandXboxController(0);
 
-    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+    private QuestNav questNav = new QuestNav();
+    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain((pose) -> questNav.resetPose(pose));
     public final ShooterSubsystem shooter = new ShooterSubsystem();
     public final TurretSubsystem turret = new TurretSubsystem();
 
+    StructPublisher<Pose2d> posePublisher =
+        NetworkTableInstance.getDefault().getStructTopic("robotPose", Pose2d.struct).publish();
+    StructPublisher<Pose2d> questPosePublisher =
+        NetworkTableInstance.getDefault().getStructTopic("questPose", Pose2d.struct).publish();
+    private VisionApriltagSubsystem visionApriltagSubsystem;
+    
     public RobotContainer() {
         configureBindings();
     }
@@ -95,5 +108,52 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         return Commands.print("No autonomous command configured");
+    }
+
+    public void autonomousInit() {
+        // Reset questNav pose right at being of auto
+        // Grab reset pose from Limelights
+        // at least one AprilTag would need to be
+        // in view in starting position
+        updateVisionPose();
+        Pose2d startPose = extractLimelightPose();
+        questNav.resetPose(startPose);
+    }
+
+    public void periodic () {
+        questNav.cleanUpQuestNavMessages();
+        posePublisher.set(drivetrain.getPose());
+        updateVisionPose();
+        questPosePublisher.set(questNav.getRobotPose());
+    }
+
+    public void updateVisionPose() {
+        if (questNav.isConnected()) {
+            questNav.updateAverageRobotPose();
+            //   drivetrain.addVisionMeasurement(
+            //       questNav.getRobotPose(), VecBuilder.fill(0.0, 0.0, 9999999.0));
+            drivetrain.addVisionMeasurement(
+                questNav.getAverageRobotPose(), VecBuilder.fill(0.0, 0.0, 0.0));
+            return;
+        }
+
+        // LimelightHelpers.PoseEstimate limelightMeasurement =
+        // visionApriltagSubsystem.getPoseEstimate();
+        // if (limelightMeasurement.tagCount >= 2
+        //     || (limelightMeasurement.tagCount == 1 && limelightMeasurement.avgTagDist < 1.25)) {
+        //   drivetrain.addVisionMeasurement(
+        //       limelightMeasurement.pose,
+        //       limelightMeasurement.timestampSeconds,
+        //       VecBuilder.fill(.6, .6, 9999999));
+        // }
+    }
+
+    private Pose2d extractLimelightPose() {
+        LimelightHelpers.PoseEstimate limelightMeasurement = visionApriltagSubsystem.getPoseEstimate();
+        if (limelightMeasurement.tagCount >= 2
+                || (limelightMeasurement.tagCount == 1 && limelightMeasurement.avgTagDist < 1.25)) {
+            return limelightMeasurement.pose;
+        }
+        return null;
     }
 }

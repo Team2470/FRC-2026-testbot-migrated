@@ -12,16 +12,19 @@ import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 
 public class ShootWhileMoving extends Command {
-    private final CommandSwerveDrivetrain m_drive;
-    private final TurretSubsystem m_turret;
-    private final ShooterSubsystem m_shooter;
-    private final boolean isPassing;
+    private final CommandSwerveDrivetrain   m_drive;
+    private final TurretSubsystem           m_turret;
+    private final ShooterSubsystem          m_shooter;
+    private final boolean                   isPassing;
 
-    public ShootWhileMoving(CommandSwerveDrivetrain drive, TurretSubsystem turret, ShooterSubsystem shooter, boolean isPassing) {
-        this.m_drive = drive;
-        this.m_turret = turret;
-        this.m_shooter = shooter;
-        this.isPassing = isPassing;
+    public ShootWhileMoving(CommandSwerveDrivetrain drive, 
+                            TurretSubsystem turret,
+                            ShooterSubsystem shooter,
+                            boolean isPassing) {
+        this.m_drive    = drive;
+        this.m_turret   = turret;
+        this.m_shooter  = shooter;
+        this.isPassing  = isPassing;
         addRequirements(m_turret, m_shooter);
     }
 
@@ -33,13 +36,22 @@ public class ShootWhileMoving extends Command {
                                                         shooterConstants.TURRET_HUB_TOLERANCE;
         double hoodToleranceDegrees     = isPassing ? shooterConstants.HOOD_PASS_TOLERANCE :
                                                         shooterConstants.HOOD_HUB_TOLERANCE;
-        double flywheelToleranceRPM             = isPassing ? shooterConstants.RPM_PASS_TOLERANCE :
+        double flywheelToleranceRPM     = isPassing ? shooterConstants.RPM_PASS_TOLERANCE :
                                                         shooterConstants.RPM_HUB_TOLERANCE;
-        Pose2d robotPose                = m_drive.getPose();
-        ChassisSpeeds fieldSpeeds       = m_drive.getFieldRelativeSpeeds();
 
+        // Get Current Pose for vector math
+        Pose2d robotPose                = m_drive.getPose();
+        
+        // Find how far from each of 2 passing spots the robot is
+        double robotToPassLeft          = fieldConstants.PASS_LEFT_LOCATION.minus(robotPose.getTranslation()).getNorm();
+        double robotToPassRight         = fieldConstants.PASS_RIGHT_LOCATION.minus(robotPose.getTranslation()).getNorm();
+        
+        // Aim for the closest location
+        Translation2d passLocation      = (robotToPassLeft < robotToPassRight) ? fieldConstants.PASS_LEFT_LOCATION :
+                                                                                    fieldConstants.PASS_RIGHT_LOCATION;
+        
         // Vector math to get basic distance (without including moving)
-        Translation2d target_location   = isPassing ? fieldConstants.PASS_LOCATION : 
+        Translation2d target_location   = isPassing ? passLocation : 
                                                         fieldConstants.HUB_LOCATION;
         Translation2d robotToGoal       = target_location.minus(robotPose.getTranslation());
         double physicalDistance         = robotToGoal.getNorm();
@@ -52,9 +64,12 @@ public class ShootWhileMoving extends Command {
         double horizontal               = ballExitVelocity * Math.cos(thetaRad);
         double flightTime               = physicalDistance / 
                                             (horizontal > 0 ? horizontal : 10.0);
-
+        
+        // Get robot speed for virtual goal math
+        ChassisSpeeds fieldSpeeds       = m_drive.getFieldRelativeSpeeds();
+        
         // The "Virtual Goal" accounts for robot velocity during ball flight
-        Translation2d virtualGoal = target_location.minus(
+        Translation2d virtualGoal       = target_location.minus(
             new Translation2d(fieldSpeeds.vxMetersPerSecond * flightTime, 
                               fieldSpeeds.vyMetersPerSecond * flightTime)
         );
@@ -80,10 +95,10 @@ public class ShootWhileMoving extends Command {
         if (m_turret.isOnTarget(turretTarget, turretToleranceDegrees) 
             && m_shooter.isAtSpeed(targetRPM, flywheelToleranceRPM)
             && m_shooter.isHoodOnTarget(targetHood, hoodToleranceDegrees)) {
-            m_shooter.runFeeder(shooterConstants.FEEDER_RUN); // TODO: set feeder speed
+            m_shooter.runFeeder(shooterConstants.FEEDER_RUN);
         }
         else {
-            m_shooter.runFeeder(shooterConstants.FEEDER_OFF); // Turn shooter off if we are not at target values
+            m_shooter.runFeeder(shooterConstants.FEEDER_OFF);
         }
     }
 }

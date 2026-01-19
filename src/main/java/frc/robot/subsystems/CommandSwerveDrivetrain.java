@@ -2,15 +2,22 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
+import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -41,6 +48,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private static final Rotation2d kRedAlliancePerspectiveRotation = Rotation2d.k180deg;
     /* Keep track if we've ever applied the operator perspective before or not */
     private boolean m_hasAppliedOperatorPerspective = false;
+    private Consumer<Pose2d> m_questPoseResetConsumer;
+    /** Swerve request to apply during robot-centric path following */
+    private final SwerveRequest.ApplyRobotSpeeds m_pathApplyRobotSpeeds =
+        new SwerveRequest.ApplyRobotSpeeds();
 
     /* Swerve requests to apply during SysId characterization */
     private final SwerveRequest.SysIdSwerveTranslation m_translationCharacterization = new SwerveRequest.SysIdSwerveTranslation();
@@ -120,10 +131,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      * @param modules               Constants for each specific module
      */
     public CommandSwerveDrivetrain(
+        Consumer<Pose2d> questPoseReset,
         SwerveDrivetrainConstants drivetrainConstants,
         SwerveModuleConstants<?, ?, ?>... modules
     ) {
         super(drivetrainConstants, modules);
+        m_questPoseResetConsumer = questPoseReset;
         if (Utils.isSimulation()) {
             startSimThread();
         }
@@ -173,17 +186,61 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      * @param modules                   Constants for each specific module
      */
     public CommandSwerveDrivetrain(
-        SwerveDrivetrainConstants drivetrainConstants,
-        double odometryUpdateFrequency,
-        Matrix<N3, N1> odometryStandardDeviation,
-        Matrix<N3, N1> visionStandardDeviation,
-        SwerveModuleConstants<?, ?, ?>... modules
-    ) {
-        super(drivetrainConstants, odometryUpdateFrequency, odometryStandardDeviation, visionStandardDeviation, modules);
+            Consumer<Pose2d> questPoseReset,
+            SwerveDrivetrainConstants drivetrainConstants,
+            double odometryUpdateFrequency,
+            Matrix<N3, N1> odometryStandardDeviation,
+            Matrix<N3, N1> visionStandardDeviation,
+            SwerveModuleConstants<?, ?, ?>... modules) {
+        super(
+            drivetrainConstants,
+            odometryUpdateFrequency,
+            odometryStandardDeviation,
+            visionStandardDeviation,
+            modules);
+        m_questPoseResetConsumer = questPoseReset;
         if (Utils.isSimulation()) {
             startSimThread();
         }
+        configureAutoBuilder();
     }
+
+    private void configureAutoBuilder() {
+        try {
+            var config = RobotConfig.fromGUISettings();
+            AutoBuilder.configure(
+                () -> getState().Pose, // Supplier of current robot pose
+                this::resetQuestPose, // Consumer for seeding pose against auto
+                () -> getState().Speeds, // Supplier of current robot speeds
+                // Consumer of ChassisSpeeds and feedforwards to drive the robot
+                (speeds, feedforwards) ->
+                    setControl(
+                    m_pathApplyRobotSpeeds
+                      .withDriveRequestType(SwerveModule.DriveRequestType.Velocity)
+                      .withSteerRequestType(SwerveModule.SteerRequestType.MotionMagicExpo)
+                      .withSpeeds(speeds)
+                      .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
+                      .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())),
+                new PPHolonomicDriveController(
+                    // PID constants for translation
+                    new PIDConstants(10, 0, 0), // last year was 0.2402346041055719
+                    // PID constants for rotation
+                    new PIDConstants(7, 0, 0)), // last year was 14.414076
+                config,
+                // Assume the path needs to be flipped for Red vs Blue, this is normally the case
+                () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
+                this // Subsystem for requirements
+                );
+        } catch (Exception ex) {
+            DriverStation.reportError(
+          "Failed to load PathPlanner config and configure AutoBuilder", ex.getStackTrace());
+        }
+  }
+
+  private void resetQuestPose(Pose2d pose) {
+    m_questPoseResetConsumer.accept(pose);
+    resetPose(pose);
+  }
 
     /**
      * Returns a command that applies the specified control request to this swerve drivetrain.
@@ -300,5 +357,17 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public void addVision(Pose2d visionPose, double timestamp) {
         // Phoenix 6 uses this method to inject vision
         this.addVisionMeasurement(visionPose, timestamp);
+    }
+
+    public void addVisionMeasurement(Pose2d visionRobotPoseMeters,
+                                        double timestampSeconds,
+                                        Vector<N3> visionMeasurementStdDevs) {
+        super.addVisionMeasurement(
+            visionRobotPoseMeters, Utils.fpgaToCurrentTime(timestampSeconds), visionMeasurementStdDevs);
+    }
+    public void addVisionMeasurement(Pose2d visionRobotPoseMeters, 
+                                        Matrix<N3, N1> visionMeasurementStdDevs) {
+        addVisionMeasurement(
+            visionRobotPoseMeters, Utils.getCurrentTimeSeconds() - 0.02, visionMeasurementStdDevs);
     }
 }
