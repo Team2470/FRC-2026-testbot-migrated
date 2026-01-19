@@ -1,5 +1,7 @@
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -84,10 +86,15 @@ public class Constants {
         public static final double RPM_PASS_TOLERANCE       = 300;
         public static final double RPM_HUB_TOLERANCE        = 100;
 
+        // TODO: grab coordinates of Center of Turret compared to our robot's origin point (typically in the center of our bellypan)
+        public static final Transform3d ROBOT_TO_TURRET = new Transform3d(-1.0, 0.0, 0.44, Rotation3d.kZero);
+
         public static InterpolatingDoubleTreeMap HUB_RPM_MAP    = new InterpolatingDoubleTreeMap();
         public static InterpolatingDoubleTreeMap PASS_RPM_MAP   = new InterpolatingDoubleTreeMap();
         public static InterpolatingDoubleTreeMap HOOD_HUB_MAP   = new InterpolatingDoubleTreeMap();
         public static InterpolatingDoubleTreeMap HOOD_PASS_MAP  = new InterpolatingDoubleTreeMap();
+        public static InterpolatingDoubleTreeMap PASS_TOF_MAP   = new InterpolatingDoubleTreeMap();
+        public static InterpolatingDoubleTreeMap HUB_TOF_MAP    = new InterpolatingDoubleTreeMap();
 
         public void ShooterInterpolation() {
             // TODO: Actually test for these values.
@@ -99,7 +106,7 @@ public class Constants {
             // Distance (meters), Hood Angle (degrees)
             HOOD_HUB_MAP.put(3.993, 52.000); 
             HOOD_HUB_MAP.put(3.048, 67.000);
-            HOOD_HUB_MAP.put(2.4384, 65.000);
+            HOOD_HUB_MAP.put(2.438, 65.000);
             HOOD_HUB_MAP.put(1.829, 72.000);
             HOOD_HUB_MAP.put(1.219, 80.000);
         
@@ -118,7 +125,7 @@ public class Constants {
             // Distance (meters), Flywheel Speed (RPM)
             HUB_RPM_MAP.put(3.993, 4247.640);
             HUB_RPM_MAP.put(3.048, 4070.655);
-            HUB_RPM_MAP.put(2.4384, 3716.685);
+            HUB_RPM_MAP.put(2.438, 3716.685);
             HUB_RPM_MAP.put(1.829, 3539.700);
             HUB_RPM_MAP.put(1.219, 3716.685);
         
@@ -131,6 +138,25 @@ public class Constants {
             PASS_RPM_MAP.put(7.620, 7079.400);
             PASS_RPM_MAP.put(9.144, 6725.430);
             PASS_RPM_MAP.put(11.280,7256.385);
+
+            // This map is time of flight in seconds
+            // when we are passing into alliance zone
+            // Distance (meters), Time of Flight (Seconds)
+            PASS_RPM_MAP.put(1.524, 1.000);
+            PASS_RPM_MAP.put(3.048, 1.200);
+            PASS_RPM_MAP.put(6.096, 1.400);
+            PASS_RPM_MAP.put(7.620, 1.600);
+            PASS_RPM_MAP.put(9.144, 1.900);
+            PASS_RPM_MAP.put(11.280, 2.400);
+        
+            // This map is time of flight in seconds
+            // when we are shooting into hub
+            // Distance (meters), Time of Flight (Seconds)
+            HUB_RPM_MAP.put(3.993, 1.900);
+            HUB_RPM_MAP.put(3.048, 1.600);
+            HUB_RPM_MAP.put(2.438, 1.200);
+            HUB_RPM_MAP.put(1.829, 1.000);
+            HUB_RPM_MAP.put(1.219, 0.900);
         }
     }
 }

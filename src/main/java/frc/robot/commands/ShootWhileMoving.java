@@ -55,23 +55,16 @@ public class ShootWhileMoving extends Command {
                                                         fieldConstants.HUB_LOCATION;
         Translation2d robotToGoal       = target_location.minus(robotPose.getTranslation());
         double physicalDistance         = robotToGoal.getNorm();
-        double guessedRPM               = isPassing ? m_shooter.getPassRPM(physicalDistance) :
-                                                        m_shooter.getHubRPM(physicalDistance);
-        double ballExitVelocity         = m_shooter.getExpectedExitVelocity(guessedRPM);
-        double guessedHoodAngle         = isPassing ? m_shooter.getPassHoodAngle(physicalDistance) : 
-                                                        m_shooter.getHubHoodAngle(physicalDistance);
-        double thetaRad                 = Math.toRadians(guessedHoodAngle);
-        double horizontal               = ballExitVelocity * Math.cos(thetaRad);
-        double flightTime               = physicalDistance / 
-                                            (horizontal > 0 ? horizontal : 10.0);
+        double timeOfFlight             = isPassing ? m_shooter.getPassTOF(physicalDistance) :
+                                                        m_shooter.getHubTOF(physicalDistance);
         
         // Get robot speed for virtual goal math
         ChassisSpeeds fieldSpeeds       = m_drive.getFieldRelativeSpeeds();
         
         // The "Virtual Goal" accounts for robot velocity during ball flight
         Translation2d virtualGoal       = target_location.minus(
-            new Translation2d(fieldSpeeds.vxMetersPerSecond * flightTime, 
-                              fieldSpeeds.vyMetersPerSecond * flightTime)
+            new Translation2d(fieldSpeeds.vxMetersPerSecond * timeOfFlight, 
+                              fieldSpeeds.vyMetersPerSecond * timeOfFlight)
         );
 
         // Vector match to include robot velocity

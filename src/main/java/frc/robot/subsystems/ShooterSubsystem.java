@@ -45,6 +45,14 @@ public ShooterSubsystem() {
     public double getPassRPM(double distance) {
         return shooterConstants.PASS_RPM_MAP.get(distance);
     }
+
+    public double getHubTOF(double distance) {
+        return shooterConstants.HUB_TOF_MAP.get(distance);
+    }
+
+    public double getPassTOF(double distance) {
+        return shooterConstants.PASS_TOF_MAP.get(distance);
+    }
     
     public double getHubHoodAngle(double distance) {
         return shooterConstants.HOOD_HUB_MAP.get(distance);
