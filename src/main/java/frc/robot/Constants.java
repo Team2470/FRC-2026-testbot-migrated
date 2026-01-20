@@ -142,21 +142,21 @@ public class Constants {
             // This map is time of flight in seconds
             // when we are passing into alliance zone
             // Distance (meters), Time of Flight (Seconds)
-            PASS_RPM_MAP.put(1.524, 1.000);
-            PASS_RPM_MAP.put(3.048, 1.200);
-            PASS_RPM_MAP.put(6.096, 1.400);
-            PASS_RPM_MAP.put(7.620, 1.600);
-            PASS_RPM_MAP.put(9.144, 1.900);
-            PASS_RPM_MAP.put(11.280, 2.400);
+            PASS_TOF_MAP.put(1.524, 1.000);
+            PASS_TOF_MAP.put(3.048, 1.200);
+            PASS_TOF_MAP.put(6.096, 1.400);
+            PASS_TOF_MAP.put(7.620, 1.600);
+            PASS_TOF_MAP.put(9.144, 1.900);
+            PASS_TOF_MAP.put(11.280, 2.400);
         
             // This map is time of flight in seconds
             // when we are shooting into hub
             // Distance (meters), Time of Flight (Seconds)
-            HUB_RPM_MAP.put(3.993, 1.900);
-            HUB_RPM_MAP.put(3.048, 1.600);
-            HUB_RPM_MAP.put(2.438, 1.200);
-            HUB_RPM_MAP.put(1.829, 1.000);
-            HUB_RPM_MAP.put(1.219, 0.900);
+            HUB_TOF_MAP.put(3.993, 1.900);
+            HUB_TOF_MAP.put(3.048, 1.600);
+            HUB_TOF_MAP.put(2.438, 1.200);
+            HUB_TOF_MAP.put(1.829, 1.000);
+            HUB_TOF_MAP.put(1.219, 0.900);
         }
     }
 }
