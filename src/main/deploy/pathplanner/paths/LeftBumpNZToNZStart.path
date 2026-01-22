@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 5.9,
+        "y": 5.5
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 7.5133638090478545,
+        "y": 5.670830285922282
+      },
+      "isLocked": false,
+      "linkedName": "LeftBumpNZ"
+    },
+    {
+      "anchor": {
+        "x": 7.8,
+        "y": 7.0
+      },
+      "prevControl": {
+        "x": 7.292313224546496,
+        "y": 6.745310294630543
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "LeftNZStart"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -90.0
+  },
+  "reversed": false,
+  "folder": "NZ",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 135.0
+  },
+  "useDefaultConstraints": true
+}
