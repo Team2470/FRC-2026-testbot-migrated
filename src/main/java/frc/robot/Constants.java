@@ -159,4 +159,12 @@ public class Constants {
             HUB_TOF_MAP.put(1.219, 0.900);
         }
     }
+
+    public static final class DashboardConstants {
+        public static final String DRIVE_MODE_KEY = "Drive Mode";
+        public static final String AUTO_COMPILED_KEY = "Auto Compiled";
+        public static final String AUTO_DESCRIPTION_KEY = "Auto Description";
+        public static final String WAIT_SECONDS_SAVED_KEY = "Wait Seconds Saved";
+        public static final String WAIT_SECONDS_DISPLAY_KEY = "Wait Seconds Display";
+  }
 }
