@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.18772187905144,
-        "y": 5.496509817997611
+        "x": 4.098076012133985,
+        "y": 5.508141593250025
       },
       "isLocked": false,
       "linkedName": "LeftBumpAZ"
@@ -20,8 +20,8 @@
         "y": 5.5
       },
       "prevControl": {
-        "x": 5.210392761452596,
-        "y": 5.500382041218659
+        "x": 5.270952805258415,
+        "y": 5.487799984033224
       },
       "nextControl": null,
       "isLocked": false,

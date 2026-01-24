@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.853065847584665,
-        "y": 6.351084337324305
+        "x": 6.757371369888109,
+        "y": 6.28112234391371
       },
       "isLocked": false,
       "linkedName": "LeftNZEnd"
@@ -20,8 +20,8 @@
         "y": 5.5
       },
       "prevControl": {
-        "x": 6.21877530146462,
-        "y": 5.819350347037843
+        "x": 6.18097975450333,
+        "y": 5.7733183587239685
       },
       "nextControl": null,
       "isLocked": false,

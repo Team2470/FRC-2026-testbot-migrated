@@ -95,22 +95,23 @@ public abstract class AutoBase extends SequentialCommandGroup {
 
     public static final class PathsBase {
         // Auto Start Paths
-        public static final Path LEFT_START_TO_DEPOT = new Path("LeftStartToDepot");
-        public static final Path RIGHT_START_TO_OUTPOST = new Path("RightStartToOutpost");
+        public static final Path LEFT_START_TO_DEPOT        = new Path("LeftStartToDepot");
+        public static final Path RIGHT_START_TO_OUTPOST     = new Path("RightStartToOutpost");
 
         // Left Side Paths
-        public static final Path DEPOT_TO_LEFT_BUMP_AZ = new Path("DepotToLeftBumpAZ");
-        public static final Path LEFT_BUMP_AZ_TO_NZ = new Path("LeftBumpAZToNZ");
-        public static final Path LEFT_BUMP_NZ_TO_AZ = new Path("LeftBumpNZToAZ");
-        public static final Path LEFT_BUMP_NZ_TO_NZ_START = new Path("LeftBumpNZToNZStart");
-        public static final Path LEFT_NZ_TO_BUMP_NZ = new Path("LeftNZToBumpNZ");
-        public static final Path LEFT_TO_RIGHT_NZ = new Path("LeftToRightNZ");
+        public static final Path DEPOT_TO_LEFT_BUMP_AZ      = new Path("DepotToLeftBumpAZ");
+        public static final Path LEFT_BUMP_AZ_TO_NZ         = new Path("LeftBumpAZToNZ");
+        public static final Path LEFT_BUMP_NZ_TO_AZ         = new Path("LeftBumpNZToAZ");
+        public static final Path LEFT_BUMP_NZ_TO_NZ_START   = new Path("LeftBumpNZToNZStart");
+        public static final Path LEFT_NZ_TO_BUMP_NZ         = new Path("LeftNZToBumpNZ");
+        public static final Path LEFT_TO_RIGHT_NZ           = new Path("LeftToRightNZ");
 
         // Right Side Paths
-        public static final Path OUTPOST_TO_RIGHT_TRENCH = new Path("OutpostToRightTrech");
-        public static final Path RIGHT_NZ_TO_RIGHT_TRENCH = new Path("RightNZToRightTrench");
-        public static final Path RIGHT_TO_LEFT_NZ = new Path("RightToLeftNZ");
-        public static final Path RIGHT_TRENCH_TO_CLIMB = new Path("RightTrenchToClimb");
-        public static final Path RIGHT_TRENCH_TO_NZ = new Path("RightTrenchToNZ");
+        public static final Path OUTPOST_TO_RIGHT_TRENCH    = new Path("OutpostToRightTrech");
+        public static final Path RIGHT_NZ_TO_RIGHT_TRENCH   = new Path("RightNZToRightTrench");
+        public static final Path RIGHT_TO_LEFT_NZ           = new Path("RightToLeftNZ");
+        public static final Path RIGHT_TRENCH_TO_CLIMB      = new Path("RightTrenchToClimb");
+        public static final Path RIGHT_TRENCH_TO_NZ         = new Path("RightTrenchToNZ");
+        public static final Path RIGHT_TRENCH_LOOP          = new Path("RightTrenchLoop");
     }
 }

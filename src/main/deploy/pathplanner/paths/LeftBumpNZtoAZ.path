@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.656291501358526,
-        "y": 5.498968225816948
+        "x": 4.519715433647327,
+        "y": 5.499746646700968
       },
       "isLocked": false,
       "linkedName": "LeftBumpNZ"
@@ -20,8 +20,8 @@
         "y": 5.5
       },
       "prevControl": {
-        "x": 4.231915414560774,
-        "y": 5.506394380028172
+        "x": 4.25173856017523,
+        "y": 5.497632917839484
       },
       "nextControl": null,
       "isLocked": false,
