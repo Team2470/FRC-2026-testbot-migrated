@@ -11,7 +11,7 @@ public class Constants {
     // Things to make constants
     // Tolerance for pass vs scoring shots in RPM and degrees
     // Translation2d of where to pass vs where to shoot
-    public static final double MINUTE_TO_SECONDS = 60.0;
+    public static final double SECONDS_PER_MINUTE = 60.0;
 
     public static boolean isBlueAlliance() {
         return DriverStation.getAlliance().isEmpty()
