@@ -77,12 +77,12 @@ public ShooterSubsystem() {
     public void setRPM(double rpm) {
         // Phoenix sends values in Rotations Per Seconds (RPS)
         // Must handle value accordingly
-        m_topMotor_1.setControl(m_velocityRequest.withVelocity(rpm / Constants.MINUTE_TO_SECONDS));
+        m_topMotor_1.setControl(m_velocityRequest.withVelocity(rpm / Constants.SECONDS_PER_MINUTE));
     }
 
     public boolean isAtSpeed(double targetRPM, double tolerance) {
         // Get actual speed (Phoenix gives RPS), convert to RPM
-        double currentRPM = m_topMotor_1.getVelocity().getValueAsDouble() * Constants.MINUTE_TO_SECONDS;
+        double currentRPM = m_topMotor_1.getVelocity().getValueAsDouble() * Constants.SECONDS_PER_MINUTE;
         
         // Tolerance: Is Current RPM = Target RPM +/- Tolerance (measured in RPM)
         return Math.abs(currentRPM - targetRPM) < tolerance;
@@ -99,7 +99,7 @@ public ShooterSubsystem() {
     // Input: RPM of the main flywheel
     // Output: Ball's velocity coming out of shooter
     public double getExpectedExitVelocity(double mainRPM) {
-        double mainRPS      = mainRPM / Constants.MINUTE_TO_SECONDS;
+        double mainRPS      = mainRPM / Constants.SECONDS_PER_MINUTE;
         double topRPS       = mainRPS * shooterConstants.BACKSPIN_GEAR_RATIO;
         double mainSurface  = mainRPS * Math.PI * shooterConstants.FLYWHEEL_DIAMETER_METERS;
         double topSurface   = topRPS * Math.PI * shooterConstants.BACKSPIN_DIAMETER_METERS;
