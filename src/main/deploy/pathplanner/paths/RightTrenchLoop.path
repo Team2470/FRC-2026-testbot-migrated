@@ -9,7 +9,7 @@
       "prevControl": null,
       "nextControl": {
         "x": 4.361878284100093,
-        "y": 0.4238550827902225
+        "y": 0.4238550827902224
       },
       "isLocked": false,
       "linkedName": "RightTrenchAlign"
@@ -20,8 +20,8 @@
         "y": 0.75
       },
       "prevControl": {
-        "x": 3.471803203130843,
-        "y": 0.8653401017898702
+        "x": 3.4718032031308437,
+        "y": 0.8653401017898706
       },
       "nextControl": {
         "x": 3.0281967968691563,
@@ -49,7 +49,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
+    "maxVelocity": 4.5,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
