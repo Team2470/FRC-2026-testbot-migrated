@@ -51,7 +51,8 @@ public class Constants {
 
         
         // Hood Constants
-        public static final int HOOD_DEVICE_ID          = 13;
+        public static final int LEFT_HOOD_DEVICE_ID     = 3;
+        public static final int RIGHT_HOOD_DEVICE_ID    = 4;
         public static final double HOOD_GEAR_RATIO      = 50.0;
         public static final double MIN_HOOD_ANGLE       = 15.0;
         public static final double MAX_HOOD_ANGLE       = 85.0;

@@ -3,7 +3,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-// import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.Follower;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.shooterConstants;
@@ -12,7 +12,7 @@ public class ShooterSubsystem extends SubsystemBase {
     private final TalonFX m_topMotor_1                      = new TalonFX(shooterConstants.FLYWHEEL_1_DEVICE_ID);
     private final TalonFX m_topMotor_2                      = new TalonFX(shooterConstants.FLYWHEEL_2_DEVICE_ID);
     private final TalonFX m_feederMotor                     = new TalonFX(shooterConstants.FEEDER_DEVICE_ID);
-    private final TalonFX m_hoodMotor                       = new TalonFX(shooterConstants.HOOD_DEVICE_ID); 
+    private final Hood m_hood                               = new Hood(); 
     private final VelocityVoltage m_velocityRequest         = new VelocityVoltage(0);
 
 public ShooterSubsystem() {
@@ -23,20 +23,10 @@ public ShooterSubsystem() {
         config.Slot0.kD = shooterConstants.FLYWHEEL_KD; 
         config.Slot0.kV = shooterConstants.FLYWHEEL_KV; 
         m_topMotor_1.getConfigurator().apply(config);
-        // m_topMotor_2.getConfigurator().apply(config);
-        // m_topMotor_2.optimizeBusUtilization();
-        // m_topMotor_2.setControl(new Follower(m_topMotor_1.getDeviceID(), false));
+        m_topMotor_2.getConfigurator().apply(config);
+        m_topMotor_2.optimizeBusUtilization();
+        m_topMotor_2.setControl(new Follower(m_topMotor_1.getDeviceID(), shooterConstants.FLYWHEEL_ALIGNMENT_VALUE));
 
-        var hoodConfig                                              = new TalonFXConfiguration();
-        hoodConfig.Slot0.kP                                         = shooterConstants.HOOD_KP;
-        hoodConfig.Slot0.kI                                         = shooterConstants.HOOD_KI;
-        hoodConfig.Slot0.kD                                         = shooterConstants.HOOD_KD;
-        hoodConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold    = shooterConstants.MAX_HOOD_SOFT_LIMIT;
-        hoodConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold    = shooterConstants.MIN_HOOD_SOFT_LIMIT;
-        hoodConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable       = true;
-        hoodConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable       = true;
-        m_hoodMotor.getConfigurator().apply(hoodConfig);
-    
     }
 
     public double getHubRPM(double distance) {
@@ -72,7 +62,8 @@ public ShooterSubsystem() {
                                 Math.min(shooterConstants.MAX_HOOD_ANGLE, degrees));
         double rotations    = (clamped / 360.0) * shooterConstants.HOOD_GEAR_RATIO;
 
-        m_hoodMotor.setControl(new com.ctre.phoenix6.controls.PositionVoltage(rotations));
+        double rotations_to_servo_pose = rotations / (2 * Math.PI); // TODO: fix math for ratio of servo position to hood angle
+        m_hood.setPosition(rotations_to_servo_pose);
     }
 
     public void setRPM(double rpm) {
@@ -90,7 +81,8 @@ public ShooterSubsystem() {
     }
 
     public boolean isHoodOnTarget(double targetDegrees, double tolerance) {
-        double currentRot = m_hoodMotor.getPosition().getValueAsDouble();
+        double currentHoodPose = m_hood.getPosition();
+        double currentRot = currentHoodPose * 2 * Math.PI; // TODO: fix math for ratio of servo position to hood angle
         double currentDeg = (currentRot / shooterConstants.HOOD_GEAR_RATIO) * 360.0;
         
         // Tolerance: Is Current Angle = Target Angle +/- Tolerance (measured in Degrees) 
