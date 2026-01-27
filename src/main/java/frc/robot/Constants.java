@@ -1,5 +1,7 @@
 package frc.robot;
 
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
+
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -32,19 +34,22 @@ public class Constants {
     }
 
     public static final class shooterConstants {
+
+        public static final MotorAlignmentValue FLYWHEEL_ALIGNMENT_VALUE = MotorAlignmentValue.Opposed;
+        
         // Flywheel Constants
-        public static final int FLYWHEEL_1_DEVICE_ID        = 10;
-        // My (Josh) guess is that we will use 2 motors on the flywheel
-        // public static final int FLYWHEEL_2_DEVICE_ID        = 10;
-        public static final double FLYWHEEL_KP              = 10.0;
+        public static final int FLYWHEEL_1_DEVICE_ID        = 1;
+        public static final int FLYWHEEL_2_DEVICE_ID        = 2;
+        public static final double FLYWHEEL_KP              = .2;
         public static final double FLYWHEEL_KI              = 0.0;
         public static final double FLYWHEEL_KD              = 0.0;
-        public static final double FLYWHEEL_KV              = 10.0;
+        public static final double FLYWHEEL_KV              = .125;
         public static final double FLYWHEEL_DIAMETER_METERS = 0.1016;
         public static final double BACKSPIN_DIAMETER_METERS = 0.0508;
         public static final double BACKSPIN_GEAR_RATIO      = 0.5;
         public static final double SHOOTER_EFFICIENCY       = 0.85;
 
+        
         // Hood Constants
         public static final int HOOD_DEVICE_ID          = 13;
         public static final double HOOD_GEAR_RATIO      = 50.0;
@@ -101,6 +106,13 @@ public class Constants {
             // Initial values are based on using desmos Trajectory Calculator
             // And do not reflect real-world-values
 
+            // This map is for the shooter flywheel
+            // when we are shooting into hub
+            // Distance (meters), Flywheel Speed (RPM)
+            // Grabbed from basic test from 1/26 Practice on proto-shooter
+            HUB_RPM_MAP.put(2.286, 2940.000);
+            HUB_RPM_MAP.put(3.962, 3420.000);
+
             // This map is for the Hood angle 
             // when we are shooting into hub
             // Distance (meters), Hood Angle (degrees)
@@ -118,17 +130,8 @@ public class Constants {
             HOOD_PASS_MAP.put(6.096, 18.0);
             HOOD_PASS_MAP.put(7.620, 23.0);
             HOOD_PASS_MAP.put(9.144, 30.0);
-            HOOD_PASS_MAP.put(11.280, 35.0);
-        
-            // This map is for the shooter flywheel
-            // when we are shooting into hub
-            // Distance (meters), Flywheel Speed (RPM)
-            HUB_RPM_MAP.put(3.993, 4247.640);
-            HUB_RPM_MAP.put(3.048, 4070.655);
-            HUB_RPM_MAP.put(2.438, 3716.685);
-            HUB_RPM_MAP.put(1.829, 3539.700);
-            HUB_RPM_MAP.put(1.219, 3716.685);
-        
+            HOOD_PASS_MAP.put(11.280, 35.0);       
+
             // This map is for the shooter flywheel
             // when we are passing into alliance zone
             // Distance (meters), Flywheel Speed (RPM)

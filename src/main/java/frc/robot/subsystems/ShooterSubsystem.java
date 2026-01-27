@@ -10,7 +10,7 @@ import frc.robot.Constants.shooterConstants;
 
 public class ShooterSubsystem extends SubsystemBase {
     private final TalonFX m_topMotor_1                      = new TalonFX(shooterConstants.FLYWHEEL_1_DEVICE_ID);
-    // private final TalonFX m_topMotor_2                      = new TalonFX(shooterConstants.FLYWHEEL_2_DEVICE_ID);
+    private final TalonFX m_topMotor_2                      = new TalonFX(shooterConstants.FLYWHEEL_2_DEVICE_ID);
     private final TalonFX m_feederMotor                     = new TalonFX(shooterConstants.FEEDER_DEVICE_ID);
     private final TalonFX m_hoodMotor                       = new TalonFX(shooterConstants.HOOD_DEVICE_ID); 
     private final VelocityVoltage m_velocityRequest         = new VelocityVoltage(0);
@@ -36,6 +36,7 @@ public ShooterSubsystem() {
         hoodConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable       = true;
         hoodConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable       = true;
         m_hoodMotor.getConfigurator().apply(hoodConfig);
+    
     }
 
     public double getHubRPM(double distance) {
