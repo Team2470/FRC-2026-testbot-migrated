@@ -11,10 +11,10 @@ public class Constants {
     public static class shooterConstants {
         public static final int FLYWHEEL_1_DEVICE_ID = 1;
         public static final int FLYWHEEL_2_DEVICE_ID = 2;
-        public static final double FLYWHEEL_KP = 0.001;
+        public static final double FLYWHEEL_KP = .2;
         public static final double FLYWHEEL_KI = 0;
         public static final double FLYWHEEL_KD = 0;
-        public static final double FLYWHEEL_KV = 0; 
+        public static final double FLYWHEEL_KV = .125; 
         public static final MotorAlignmentValue FLYWHEEL_ALIGNMENT_VALUE = MotorAlignmentValue.Opposed;
 
          // TODO: grab coordinates of Center of Turret compared to our robot's origin point (typically in the center of our bellypan)
