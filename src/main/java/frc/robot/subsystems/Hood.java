@@ -28,15 +28,17 @@ public class Hood extends SubsystemBase {
     private final Servo leftServo;
     private final Servo rightServo;
 
-    private double currentPosition = 0.5;
-    private double targetPosition = 0.5;
+    private double currentPosition  = 0.5;
+    private double targetPosition   = 0.5;
     private Time lastUpdateTime = Seconds.of(0);
 
     public Hood() {
-        leftServo = new Servo(shooterConstants.LEFT_HOOD_DEVICE_ID);
-        rightServo = new Servo(shooterConstants.RIGHT_HOOD_DEVICE_ID);
-        leftServo.setBoundsMicroseconds(2000, 1800, 1500, 1200, 1000);
-        rightServo.setBoundsMicroseconds(2000, 1800, 1500, 1200, 1000);
+        leftServo   = new Servo(shooterConstants.LEFT_HOOD_DEVICE_ID);
+        rightServo  = new Servo(shooterConstants.RIGHT_HOOD_DEVICE_ID);
+        leftServo.setBoundsMicroseconds(2000, 1800,
+                                    1500, 1200, 1000);
+        rightServo.setBoundsMicroseconds(2000, 1800,
+                                    1500, 1200, 1000);
         setPosition(currentPosition);
         SmartDashboard.putData(this);
     }

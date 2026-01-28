@@ -43,7 +43,7 @@ public class LeftNZRightClimb extends AutoBase{
             // Run Hopper/Feeder
             // Intake Auto Command
         ));
-        // When traversing bump, only 
+        // When traversing bump, only
         addCommands(
             followPathCommand(leftBumpAZToNZ.getPathPlannerPath())
         );
@@ -57,7 +57,7 @@ public class LeftNZRightClimb extends AutoBase{
         ));
         // Sweep
         // Run intake for full path
-        // PassWhileMoving for most, but not entire path 
+        // PassWhileMoving for most, but not entire path
         // Give time to fill hopper for shooting volley later
         addCommands(new ParallelCommandGroup(
             followPathCommand(leftToRightNZ.getPathPlannerPath())
@@ -85,7 +85,7 @@ public class LeftNZRightClimb extends AutoBase{
         ));
         // Sweep
         // Run intake for full path
-        // PassWhileMoving for most, but not entire path 
+        // PassWhileMoving for most, but not entire path
         // Give time to fill hopper for shooting volley later
         addCommands(new ParallelCommandGroup(
             followPathCommand(rightToLeftNZ.getPathPlannerPath())
@@ -93,6 +93,6 @@ public class LeftNZRightClimb extends AutoBase{
             // Run Hopper/Feeder with 2 second race/deadline
             // Intake Auto Command
         ));
-        
+
     }
 }

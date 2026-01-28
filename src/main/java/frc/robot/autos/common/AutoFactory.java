@@ -2,8 +2,11 @@ package frc.robot.autos.common;
 
 import java.util.function.Supplier;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants.DashboardConstants;
 import frc.robot.RobotState;
+import frc.robot.autos.modes.LeftNZRightClimb;
 import frc.robot.util.Dashboard;
 import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 import org.littletonrobotics.junction.networktables.LoggedNetworkString;
@@ -51,7 +54,8 @@ public class AutoFactory {
     }
 
     public static enum Auto {
-        NO_AUTO(null);
+        NO_AUTO(null),
+        LEFT_NZ_RIGHT_CLIMB(LeftNZRightClimb.class);
 
         private final Class<? extends AutoBase> autoClass;
 

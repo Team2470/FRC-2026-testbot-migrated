@@ -55,7 +55,7 @@ public class RobotContainer {
     StructPublisher<Pose2d> questPosePublisher =
         NetworkTableInstance.getDefault().getStructTopic("questPose", Pose2d.struct).publish();
     private VisionApriltagSubsystem visionApriltagSubsystem;
-    
+
     public RobotContainer() {
         configureBindings();
     }
@@ -99,7 +99,7 @@ public class RobotContainer {
         // Shoot at Hub while moving
         joystick.rightTrigger()
         .whileTrue(new ShootWhileMoving(drivetrain, turret, shooter, false));
-        
+
         // Pass to Alliance zone while moving
         joystick.leftTrigger()
             .whileTrue(new ShootWhileMoving(drivetrain, turret, shooter, true));

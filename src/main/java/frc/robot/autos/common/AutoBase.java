@@ -72,7 +72,7 @@ public abstract class AutoBase extends SequentialCommandGroup {
                     "Couldn't get starting pose from auto file: " + autoName + e.getMessage(), e.getStackTrace());
             return null;
         }
-    }    
+    }
 
     public static class Path { // combines access to pathplanner and choreo
         private String pathPlannerPathName;

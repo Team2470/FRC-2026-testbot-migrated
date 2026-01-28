@@ -107,7 +107,7 @@ public class VisionApriltagSubsystem extends SubsystemBase {
     }
 
     public String getPipelineAsString() {
-        double index = LimelightHelpers.getCurrentPipelineIndex(getLimelightName());  
+        double index = LimelightHelpers.getCurrentPipelineIndex(getLimelightName());
         if (index < VisionApriltagConstants.Pipelines.values().length) {
             return VisionApriltagConstants.Pipelines.values()[(int) index].toString();
         }

@@ -12,16 +12,16 @@ public class ShooterSubsystem extends SubsystemBase {
     private final TalonFX m_topMotor_1                      = new TalonFX(shooterConstants.FLYWHEEL_1_DEVICE_ID);
     private final TalonFX m_topMotor_2                      = new TalonFX(shooterConstants.FLYWHEEL_2_DEVICE_ID);
     private final TalonFX m_feederMotor                     = new TalonFX(shooterConstants.FEEDER_DEVICE_ID);
-    private final Hood m_hood                               = new Hood(); 
+    private final Hood m_hood                               = new Hood();
     private final VelocityVoltage m_velocityRequest         = new VelocityVoltage(0);
 
 public ShooterSubsystem() {
         TalonFXConfiguration config = new TalonFXConfiguration();
         // PID gains must be tuned for RPS (Phoenix 6 standard)
-        config.Slot0.kP = shooterConstants.FLYWHEEL_KP; 
-        config.Slot0.kI = shooterConstants.FLYWHEEL_KI; 
-        config.Slot0.kD = shooterConstants.FLYWHEEL_KD; 
-        config.Slot0.kV = shooterConstants.FLYWHEEL_KV; 
+        config.Slot0.kP = shooterConstants.FLYWHEEL_KP;
+        config.Slot0.kI = shooterConstants.FLYWHEEL_KI;
+        config.Slot0.kD = shooterConstants.FLYWHEEL_KD;
+        config.Slot0.kV = shooterConstants.FLYWHEEL_KV;
         m_topMotor_1.getConfigurator().apply(config);
         m_topMotor_2.getConfigurator().apply(config);
         m_topMotor_2.optimizeBusUtilization();
@@ -44,13 +44,13 @@ public ShooterSubsystem() {
     public double getPassTOF(double distance) {
         return shooterConstants.PASS_TOF_MAP.get(distance);
     }
-    
+
     public double getHubHoodAngle(double distance) {
-        return shooterConstants.HOOD_HUB_MAP.get(distance);
+        return shooterConstants.HUB_HOOD_MAP.get(distance);
     }
-    
+
     public double getPassHoodAngle(double distance) {
-        return shooterConstants.HOOD_PASS_MAP.get(distance);
+        return shooterConstants.PASS_HOOD_MAP.get(distance);
     }
 
     public void runFeeder(double speed) {
@@ -58,7 +58,7 @@ public ShooterSubsystem() {
     }
 
     public void setHoodAngle(double degrees) {
-        double clamped      = Math.max(shooterConstants.MIN_HOOD_ANGLE, 
+        double clamped      = Math.max(shooterConstants.MIN_HOOD_ANGLE,
                                 Math.min(shooterConstants.MAX_HOOD_ANGLE, degrees));
         double rotations    = (clamped / 360.0) * shooterConstants.HOOD_GEAR_RATIO;
 
@@ -75,7 +75,7 @@ public ShooterSubsystem() {
     public boolean isAtSpeed(double targetRPM, double tolerance) {
         // Get actual speed (Phoenix gives RPS), convert to RPM
         double currentRPM = m_topMotor_1.getVelocity().getValueAsDouble() * Constants.SECONDS_PER_MINUTE;
-        
+
         // Tolerance: Is Current RPM = Target RPM +/- Tolerance (measured in RPM)
         return Math.abs(currentRPM - targetRPM) < tolerance;
     }
@@ -84,8 +84,8 @@ public ShooterSubsystem() {
         double currentHoodPose = m_hood.getPosition();
         double currentRot = currentHoodPose * 2 * Math.PI; // TODO: fix math for ratio of servo position to hood angle
         double currentDeg = (currentRot / shooterConstants.HOOD_GEAR_RATIO) * 360.0;
-        
-        // Tolerance: Is Current Angle = Target Angle +/- Tolerance (measured in Degrees) 
+
+        // Tolerance: Is Current Angle = Target Angle +/- Tolerance (measured in Degrees)
         return Math.abs(currentDeg - targetDegrees) < tolerance;
     }
 
@@ -96,7 +96,7 @@ public ShooterSubsystem() {
         double topRPS       = mainRPS * shooterConstants.BACKSPIN_GEAR_RATIO;
         double mainSurface  = mainRPS * Math.PI * shooterConstants.FLYWHEEL_DIAMETER_METERS;
         double topSurface   = topRPS * Math.PI * shooterConstants.BACKSPIN_DIAMETER_METERS;
-        
+
         // The ball speed is roughly the average of the two contacting surfaces
         // Multiplied by efficiency (slip)
         return ((mainSurface + topSurface) / 2.0) * shooterConstants.SHOOTER_EFFICIENCY;
