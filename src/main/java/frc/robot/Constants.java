@@ -16,6 +16,22 @@ public class Constants {
         public static final double FLYWHEEL_KD = 0;
         public static final double FLYWHEEL_KV = .125; 
         public static final MotorAlignmentValue FLYWHEEL_ALIGNMENT_VALUE = MotorAlignmentValue.Opposed;
+        
+        // Turret Constants
+        public static final int TURRET_DEVICE_ID                        = 0;
+        public static final double TURRET_GEAR_RATIO                    = 50.0;
+        public static final double MIN_TURRET_ANGLE                     = 0.0;
+        public static final double MAX_TURRET_ANGLE                     = 180.0;
+        public static final double MIN_TURRET_SOFT_LIMIT                = MIN_TURRET_ANGLE /
+                                                                            360.0 * TURRET_GEAR_RATIO;
+        public static final double MAX_TURRET_SOFT_LIMIT                = MAX_TURRET_ANGLE /
+                                                                            360.0 * TURRET_GEAR_RATIO;
+        public static final double TURRET_KP                            = 0.15;
+        public static final double TURRET_KI                            = 0.0;
+        public static final double TURRET_KD                            = 0.0;
+        public static final double TURRET_KV                            = 0.105;
+        public static final double TURRET_MOTION_MAGIC_CRUISE_VELOCITY  = 80.0;
+        public static final double TURRET_MOTION_MAGIC_ACCELERACTIION   = 160.0;
 
          // TODO: grab coordinates of Center of Turret compared to our robot's origin point (typically in the center of our bellypan)
         public static final Transform3d ROBOT_TO_TURRET = new Transform3d(-1.0, 0.0, 0.44, Rotation3d.kZero);
