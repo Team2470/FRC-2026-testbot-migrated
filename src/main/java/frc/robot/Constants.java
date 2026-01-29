@@ -63,7 +63,7 @@ public class Constants {
         public static final double HOOD_KD              = 0.0;
 
         // Turret Constants
-        public static final int TURRET_DEVICE_ID                        = 14;
+        public static final int TURRET_DEVICE_ID                        = 0;
         public static final double TURRET_GEAR_RATIO                    = 50.0;
         public static final double MIN_TURRET_ANGLE                     = 0.0;
         public static final double MAX_TURRET_ANGLE                     = 180.0;
@@ -71,10 +71,10 @@ public class Constants {
                                                                             360.0 * TURRET_GEAR_RATIO;
         public static final double MAX_TURRET_SOFT_LIMIT                = MAX_TURRET_ANGLE /
                                                                             360.0 * TURRET_GEAR_RATIO;
-        public static final double TURRET_KP                            = 0.01;
+        public static final double TURRET_KP                            = 0.15;
         public static final double TURRET_KI                            = 0.0;
         public static final double TURRET_KD                            = 0.0;
-        public static final double TURRET_KV                            = 0.01;
+        public static final double TURRET_KV                            = 0.105;
         public static final double TURRET_MOTION_MAGIC_CRUISE_VELOCITY  = 80.0;
         public static final double TURRET_MOTION_MAGIC_ACCELERACTIION   = 160.0;
 
