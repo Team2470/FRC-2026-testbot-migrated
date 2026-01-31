@@ -20,6 +20,7 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Shooter;
 import frc.robot.commands.ShootWhileMoving;
+import frc.robot.subsystems.Hood;
 
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -36,6 +37,8 @@ public class RobotContainer {
 
     private final CommandXboxController joystick = new CommandXboxController(0);
 
+    private final Hood linearServo = new Hood();
+
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     public final Shooter shooter = new Shooter();
@@ -44,6 +47,10 @@ public class RobotContainer {
         configureBindings();
     }
 
+    /*  public void periodic() {
+        Hood.periodic();
+    } Is this nessesary if there's a periodic in the Hood class? */
+    
     private void configureBindings() {
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
@@ -67,7 +74,12 @@ public class RobotContainer {
         joystick.b().whileTrue(drivetrain.applyRequest(() ->
             point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
         ));
-        
+
+
+        joystick.x().whileTrue(Commands.runOnce(() -> linearServo.extendActuator()));
+        joystick.y().whileTrue(Commands.runOnce(() -> linearServo.retractActuator()));
+
+
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
         joystick.back().and(joystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
