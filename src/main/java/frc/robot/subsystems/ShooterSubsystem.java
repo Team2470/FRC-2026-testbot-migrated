@@ -45,7 +45,7 @@ public ShooterSubsystem() {
     public void setHoodAngle(double degrees) {
         double clamped      = Math.max(shooterConstants.MIN_HOOD_ANGLE,
                                 Math.min(shooterConstants.MAX_HOOD_ANGLE, degrees));
-        double rotations    = (clamped / 360.0) * shooterConstants.HOOD_GEAR_RATIO;
+        double rotations    = (clamped / 360.0) * shooterConstants.HOOD_LENGTH_TO_ANGLE_RATIO;
 
         double rotations_to_servo_pose = rotations / (2 * Math.PI); // TODO: fix math for ratio of servo position to hood angle
         m_hood.setPosition(rotations_to_servo_pose);
@@ -68,7 +68,7 @@ public ShooterSubsystem() {
     public boolean isHoodOnTarget(double targetDegrees, double tolerance) {
         double currentHoodPose = m_hood.getPosition();
         double currentRot = currentHoodPose * 2 * Math.PI; // TODO: fix math for ratio of servo position to hood angle
-        double currentDeg = (currentRot / shooterConstants.HOOD_GEAR_RATIO) * 360.0;
+        double currentDeg = (currentRot / shooterConstants.HOOD_LENGTH_TO_ANGLE_RATIO) * 360.0;
 
         // Tolerance: Is Current Angle = Target Angle +/- Tolerance (measured in Degrees)
         return Math.abs(currentDeg - targetDegrees) < tolerance;
@@ -86,4 +86,5 @@ public ShooterSubsystem() {
         // Multiplied by efficiency (slip)
         return ((mainSurface + topSurface) / 2.0) * shooterConstants.SHOOTER_EFFICIENCY;
     }
+
 }

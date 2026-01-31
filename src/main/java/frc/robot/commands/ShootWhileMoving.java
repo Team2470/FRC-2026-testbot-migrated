@@ -3,10 +3,12 @@ package frc.robot.commands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.fieldConstants;
 import frc.robot.Constants.shooterConstants;
+import frc.robot.Constants.shooterConstants.SHOOTER_PARAMETERS;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
@@ -70,13 +72,13 @@ public class ShootWhileMoving extends Command {
         // Vector match to include robot velocity
         Translation2d robotToVirtual    = virtualGoal.minus(robotPose.getTranslation());
         double virtualDistance          = robotToVirtual.getNorm();
+        SHOOTER_PARAMETERS shotParams   = isPassing ? m_shooter.getPassParameters(virtualDistance) :
+                                                        m_shooter.getHubParameters(virtualDistance);
         Rotation2d fieldRelativeTarget  = robotToVirtual.getAngle();
         Rotation2d robotRotation        = robotPose.getRotation();
         Rotation2d turretTarget         = fieldRelativeTarget.minus(robotRotation);
-        double targetRPM                = isPassing ? m_shooter.getPassParameters(virtualDistance).rpm() :
-                                                        m_shooter.getHubParameters(virtualDistance).rpm();
-        double targetHood               = isPassing ? m_shooter.getPassParameters(virtualDistance).hoodAngle() :
-                                                        m_shooter.getHubParameters(virtualDistance).hoodAngle();
+        double targetRPM                = shotParams.rpm();
+        double targetHood               = shotParams.hoodAngle();
 
         // Set Subsystem Targets
         m_turret.setTargetAngle(turretTarget);
@@ -94,4 +96,5 @@ public class ShootWhileMoving extends Command {
             m_shooter.runFeeder(shooterConstants.FEEDER_OFF);
         }
     }
+
 }

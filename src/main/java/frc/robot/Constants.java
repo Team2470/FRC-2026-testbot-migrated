@@ -5,7 +5,6 @@ import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.wpilibj.DriverStation;
 
@@ -23,15 +22,18 @@ public class Constants {
 
     public static final class fieldConstants {
         // Target Locations
-        public static final Translation2d BLUE_HUB_LOCATION         = new Translation2d(4.600, 4.025);
-        public static final Translation2d RED_HUB_LOCATION          = new Translation2d(12.000, 4.025);
-        public static final Translation2d BLUE_RIGHT_PASS_LOCATION  = new Translation2d(3.750, 2.000);
-        public static final Translation2d BLUE_LEFT_PASS_LOCATION   = new Translation2d(3.750, 6.000);
-        public static final Translation2d RED_LEFT_PASS_LOCATION    = new Translation2d(12.750, 2.000);
-        public static final Translation2d RED_RIGHT_PASS_LOCATION   = new Translation2d(12.750, 6.000);
-        public static final Translation2d HUB_LOCATION              = isBlueAlliance() ? BLUE_HUB_LOCATION : RED_HUB_LOCATION;
-        public static final Translation2d PASS_LEFT_LOCATION        = isBlueAlliance() ? BLUE_LEFT_PASS_LOCATION : RED_LEFT_PASS_LOCATION;
-        public static final Translation2d PASS_RIGHT_LOCATION       = isBlueAlliance() ? BLUE_RIGHT_PASS_LOCATION : RED_RIGHT_PASS_LOCATION;
+        public static final Translation2d BLUE_HUB_LOCATION             = new Translation2d(4.600, 4.025);
+        public static final Translation2d RED_HUB_LOCATION              = new Translation2d(12.000, 4.025);
+        public static final Translation2d BLUE_RIGHT_PASS_LOCATION      = new Translation2d(3.750, 2.000);
+        public static final Translation2d BLUE_LEFT_PASS_LOCATION       = new Translation2d(3.750, 6.000);
+        public static final Translation2d RED_LEFT_PASS_LOCATION        = new Translation2d(12.750, 2.000);
+        public static final Translation2d RED_RIGHT_PASS_LOCATION       = new Translation2d(12.750, 6.000);
+        public static final Translation2d HUB_LOCATION                  = isBlueAlliance() ? BLUE_HUB_LOCATION :
+                                                                                                RED_HUB_LOCATION;
+        public static final Translation2d PASS_LEFT_LOCATION            = isBlueAlliance() ? BLUE_LEFT_PASS_LOCATION :
+                                                                                                RED_LEFT_PASS_LOCATION;
+        public static final Translation2d PASS_RIGHT_LOCATION           = isBlueAlliance() ? BLUE_RIGHT_PASS_LOCATION :
+                                                                                                RED_RIGHT_PASS_LOCATION;
     }
 
     public static final class shooterConstants {
@@ -39,35 +41,36 @@ public class Constants {
         public static final MotorAlignmentValue FLYWHEEL_ALIGNMENT_VALUE = MotorAlignmentValue.Opposed;
 
         // Flywheel Constants
-        public static final int FLYWHEEL_1_DEVICE_ID        = 1;
-        public static final int FLYWHEEL_2_DEVICE_ID        = 2;
-        public static final double FLYWHEEL_KP              = .2;
-        public static final double FLYWHEEL_KI              = 0.0;
-        public static final double FLYWHEEL_KD              = 0.0;
-        public static final double FLYWHEEL_KV              = .125;
-        public static final double FLYWHEEL_DIAMETER_METERS = 0.1016;
-        public static final double BACKSPIN_DIAMETER_METERS = 0.0508;
-        public static final double BACKSPIN_GEAR_RATIO      = 0.5;
-        public static final double SHOOTER_EFFICIENCY       = 0.85;
-
+        public static final int FLYWHEEL_1_DEVICE_ID                    = 1;
+        public static final int FLYWHEEL_2_DEVICE_ID                    = 2;
+        public static final double FLYWHEEL_KP                          = .2;
+        public static final double FLYWHEEL_KI                          = 0.0;
+        public static final double FLYWHEEL_KD                          = 0.0;
+        public static final double FLYWHEEL_KV                          = .125;
+        public static final double FLYWHEEL_DIAMETER_METERS             = 0.1016;
+        public static final double BACKSPIN_DIAMETER_METERS             = 0.0508;
+        public static final double BACKSPIN_GEAR_RATIO                  = 0.5;
+        public static final double SHOOTER_EFFICIENCY                   = 0.85;
 
         // Hood Constants
-        public static final int LEFT_HOOD_DEVICE_ID     = 3;
-        public static final int RIGHT_HOOD_DEVICE_ID    = 4;
-        public static final double HOOD_GEAR_RATIO      = 50.0;
-        public static final double MIN_HOOD_ANGLE       = 15.0;
-        public static final double MAX_HOOD_ANGLE       = 85.0;
-        public static final double MIN_HOOD_SOFT_LIMIT  = MIN_HOOD_ANGLE / 360.0 * HOOD_GEAR_RATIO;
-        public static final double MAX_HOOD_SOFT_LIMIT  = MAX_HOOD_ANGLE / 360.0 * HOOD_GEAR_RATIO;
-        public static final double HOOD_KP              = 20.0;
-        public static final double HOOD_KI              = 0.0;
-        public static final double HOOD_KD              = 0.0;
+        public static final int LEFT_HOOD_DEVICE_ID                     = 3;
+        public static final int RIGHT_HOOD_DEVICE_ID                    = 4;
+        public static final double HOOD_LENGTH_TO_ANGLE_RATIO           = 50.0; // Servo has position from 0 to 1, we need to convert that to the full range of motion in degrees
+        public static final double MIN_HOOD_ANGLE                       = 15.0;
+        public static final double MAX_HOOD_ANGLE                       = 85.0;
+        public static final double MIN_HOOD_SOFT_LIMIT                  = MIN_HOOD_ANGLE / 360.0 * HOOD_LENGTH_TO_ANGLE_RATIO;
+        public static final double MAX_HOOD_SOFT_LIMIT                  = MAX_HOOD_ANGLE / 360.0 * HOOD_LENGTH_TO_ANGLE_RATIO;
+        public static final double HOOD_KP                              = 20.0;
+        public static final double HOOD_KI                              = 0.0;
+        public static final double HOOD_KD                              = 0.0;
 
         // Turret Constants
         public static final int TURRET_DEVICE_ID                        = 0;
         public static final double TURRET_GEAR_RATIO                    = 50.0;
-        public static final double MIN_TURRET_ANGLE                     = 0.0;
-        public static final double MAX_TURRET_ANGLE                     = 180.0;
+        // Even thought the Turret is designed to have a 360 degree range of motion
+        // set min/max points short to avoid roll-over issues
+        public static final double MIN_TURRET_ANGLE                     =   0.500;
+        public static final double MAX_TURRET_ANGLE                     = 359.500;
         public static final double MIN_TURRET_SOFT_LIMIT                = MIN_TURRET_ANGLE /
                                                                             360.0 * TURRET_GEAR_RATIO;
         public static final double MAX_TURRET_SOFT_LIMIT                = MAX_TURRET_ANGLE /
@@ -80,22 +83,22 @@ public class Constants {
         public static final double TURRET_MOTION_MAGIC_ACCELERACTIION   = 160.0;
 
         // Feeder Constants
-        public static final int FEEDER_DEVICE_ID    = 11;
-        public static final double FEEDER_RUN       = 1.0;
-        public static final double FEEDER_OFF       = 0.0;
+        public static final int FEEDER_DEVICE_ID                        = 11;
+        public static final double FEEDER_RUN                           = 1.0;
+        public static final double FEEDER_OFF                           = 0.0;
 
         // Tolerances
         // TODO: Run tests to determine what level of tolerance gives
         // "the best" balance of speed and accuracy
-        public static final double TURRET_PASS_TOLERANCE    = 3.0;
-        public static final double TURRET_HUB_TOLERANCE     = 1.0;
-        public static final double HOOD_PASS_TOLERANCE      = 3.0;
-        public static final double HOOD_HUB_TOLERANCE       = 1.0;
-        public static final double RPM_PASS_TOLERANCE       = 300;
-        public static final double RPM_HUB_TOLERANCE        = 100;
+        public static final double TURRET_PASS_TOLERANCE                = 3.0;
+        public static final double TURRET_HUB_TOLERANCE                 = 1.0;
+        public static final double HOOD_PASS_TOLERANCE                  = 3.0;
+        public static final double HOOD_HUB_TOLERANCE                   = 1.0;
+        public static final double RPM_PASS_TOLERANCE                   = 300;
+        public static final double RPM_HUB_TOLERANCE                    = 100;
 
         // TODO: grab coordinates of Center of Turret compared to our robot's origin point (typically in the center of our bellypan)
-        public static final Transform3d ROBOT_TO_TURRET = new Transform3d(-1.0, 0.0, 0.44, Rotation3d.kZero);
+        public static final Transform3d ROBOT_TO_TURRET                 = new Transform3d(1.0, 0.0, 0.44, Rotation3d.kZero);
 
         // Record to easily store parameters for shoot on the move
         public record SHOOTER_PARAMETERS(double rpm, double hoodAngle, double timeOfFlight){}
@@ -156,10 +159,10 @@ public class Constants {
     }
 
     public static final class DashboardConstants {
-        public static final String DRIVE_MODE_KEY = "Drive Mode";
-        public static final String AUTO_COMPILED_KEY = "Auto Compiled";
-        public static final String AUTO_DESCRIPTION_KEY = "Auto Description";
-        public static final String WAIT_SECONDS_SAVED_KEY = "Wait Seconds Saved";
+        public static final String DRIVE_MODE_KEY           = "Drive Mode";
+        public static final String AUTO_COMPILED_KEY        = "Auto Compiled";
+        public static final String AUTO_DESCRIPTION_KEY     = "Auto Description";
+        public static final String WAIT_SECONDS_SAVED_KEY   = "Wait Seconds Saved";
         public static final String WAIT_SECONDS_DISPLAY_KEY = "Wait Seconds Display";
   }
 }
