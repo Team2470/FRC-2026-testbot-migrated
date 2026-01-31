@@ -3,7 +3,6 @@ package frc.robot.commands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.fieldConstants;
@@ -19,6 +18,16 @@ public class ShootWhileMoving extends Command {
     private final ShooterSubsystem          m_shooter;
     private final boolean                   isPassing;
 
+    public double           turretToleranceDegrees;
+    public double           hoodToleranceDegrees;
+    public double           flywheelToleranceRPM;
+    public Pose2d           robotPose;
+    public double           robotToPassLeft;
+    public double           robotToPassRight;
+    public Translation2d    target_location = new Translation2d(0.0, 0.0);
+    public Translation2d    robotToGoal     = new Translation2d(0.0, 0.0);
+
+
     public ShootWhileMoving(CommandSwerveDrivetrain drive,
                             TurretSubsystem turret,
                             ShooterSubsystem shooter,
@@ -30,35 +39,34 @@ public class ShootWhileMoving extends Command {
         addRequirements(m_turret, m_shooter);
     }
 
+    // Initialized is used to grab constants depending on if we are passing or not
+    public void initialize() {
+        robotPose                   = m_drive.getPose();
+        if(isPassing) {
+            turretToleranceDegrees  = shooterConstants.TURRET_PASS_TOLERANCE;
+            hoodToleranceDegrees    = shooterConstants.HOOD_PASS_TOLERANCE;
+            flywheelToleranceRPM    = shooterConstants.RPM_PASS_TOLERANCE;
+            // Find how far from each of 2 passing spots the robot is
+            robotToPassLeft         = fieldConstants.PASS_LEFT_LOCATION.minus(robotPose.getTranslation()).getNorm();
+            robotToPassRight        = fieldConstants.PASS_RIGHT_LOCATION.minus(robotPose.getTranslation()).getNorm();
+            // Aim for the closest location
+            target_location         = (robotToPassLeft < robotToPassRight) ? fieldConstants.PASS_LEFT_LOCATION :
+                                                                                fieldConstants.PASS_RIGHT_LOCATION;
+        } else {
+            turretToleranceDegrees  = shooterConstants.TURRET_HUB_TOLERANCE;
+            hoodToleranceDegrees    = shooterConstants.HOOD_HUB_TOLERANCE;
+            flywheelToleranceRPM    = shooterConstants.RPM_HUB_TOLERANCE;
+            // Vector math to get basic distance (without including moving)
+            target_location         = fieldConstants.HUB_LOCATION;
+        }
+    }
+
     @Override
     public void execute() {
-        // Tolerances are different for if we are passing or shooting
-        // Thought process being that we don't need to be as accurate when passing
-        double turretToleranceDegrees   = isPassing ? shooterConstants.TURRET_PASS_TOLERANCE :
-                                                        shooterConstants.TURRET_HUB_TOLERANCE;
-        double hoodToleranceDegrees     = isPassing ? shooterConstants.HOOD_PASS_TOLERANCE :
-                                                        shooterConstants.HOOD_HUB_TOLERANCE;
-        double flywheelToleranceRPM     = isPassing ? shooterConstants.RPM_PASS_TOLERANCE :
-                                                        shooterConstants.RPM_HUB_TOLERANCE;
-
-        // Get Current Pose for vector math
-        Pose2d robotPose                = m_drive.getPose();
-
-        // Find how far from each of 2 passing spots the robot is
-        double robotToPassLeft          = fieldConstants.PASS_LEFT_LOCATION.minus(robotPose.getTranslation()).getNorm();
-        double robotToPassRight         = fieldConstants.PASS_RIGHT_LOCATION.minus(robotPose.getTranslation()).getNorm();
-
-        // Aim for the closest location
-        Translation2d passLocation      = (robotToPassLeft < robotToPassRight) ? fieldConstants.PASS_LEFT_LOCATION :
-                                                                                    fieldConstants.PASS_RIGHT_LOCATION;
-
-        // Vector math to get basic distance (without including moving)
-        Translation2d target_location   = isPassing ? passLocation :
-                                                        fieldConstants.HUB_LOCATION;
-        Translation2d robotToGoal       = target_location.minus(robotPose.getTranslation());
-        double physicalDistance         = robotToGoal.getNorm();
-        double timeOfFlight             = isPassing ? m_shooter.getPassParameters(physicalDistance).timeOfFlight() :
-                                                        m_shooter.getHubParameters(physicalDistance).timeOfFlight();
+        robotToGoal             = target_location.minus(robotPose.getTranslation());
+        double physicalDistance = robotToGoal.getNorm();
+        double timeOfFlight     = isPassing ? m_shooter.getPassParameters(physicalDistance).timeOfFlight() :
+                                                m_shooter.getHubParameters(physicalDistance).timeOfFlight();
 
         // Get robot speed for virtual goal math
         ChassisSpeeds fieldSpeeds       = m_drive.getFieldRelativeSpeeds();
@@ -96,5 +104,4 @@ public class ShootWhileMoving extends Command {
             m_shooter.runFeeder(shooterConstants.FEEDER_OFF);
         }
     }
-
 }
