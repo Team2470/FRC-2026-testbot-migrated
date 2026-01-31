@@ -7,6 +7,7 @@ import com.ctre.phoenix6.controls.Follower;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.shooterConstants;
+import frc.robot.Constants.shooterConstants.SHOOTER_PARAMETERS;
 
 public class ShooterSubsystem extends SubsystemBase {
     private final TalonFX m_topMotor_1                      = new TalonFX(shooterConstants.FLYWHEEL_1_DEVICE_ID);
@@ -29,28 +30,12 @@ public ShooterSubsystem() {
 
     }
 
-    public double getHubRPM(double distance) {
-        return shooterConstants.HUB_RPM_MAP.get(distance);
+    public SHOOTER_PARAMETERS getHubParameters(double distance) {
+        return shooterConstants.HUB_MAP.get(distance);
     }
 
-    public double getPassRPM(double distance) {
-        return shooterConstants.PASS_RPM_MAP.get(distance);
-    }
-
-    public double getHubTOF(double distance) {
-        return shooterConstants.HUB_TOF_MAP.get(distance);
-    }
-
-    public double getPassTOF(double distance) {
-        return shooterConstants.PASS_TOF_MAP.get(distance);
-    }
-
-    public double getHubHoodAngle(double distance) {
-        return shooterConstants.HUB_HOOD_MAP.get(distance);
-    }
-
-    public double getPassHoodAngle(double distance) {
-        return shooterConstants.PASS_HOOD_MAP.get(distance);
+    public SHOOTER_PARAMETERS getPassParameters(double distance) {
+        return shooterConstants.PASS_MAP.get(distance);
     }
 
     public void runFeeder(double speed) {

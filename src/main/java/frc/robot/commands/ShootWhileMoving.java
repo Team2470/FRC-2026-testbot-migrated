@@ -55,8 +55,8 @@ public class ShootWhileMoving extends Command {
                                                         fieldConstants.HUB_LOCATION;
         Translation2d robotToGoal       = target_location.minus(robotPose.getTranslation());
         double physicalDistance         = robotToGoal.getNorm();
-        double timeOfFlight             = isPassing ? m_shooter.getPassTOF(physicalDistance) :
-                                                        m_shooter.getHubTOF(physicalDistance);
+        double timeOfFlight             = isPassing ? m_shooter.getPassParameters(physicalDistance).timeOfFlight() :
+                                                        m_shooter.getHubParameters(physicalDistance).timeOfFlight();
 
         // Get robot speed for virtual goal math
         ChassisSpeeds fieldSpeeds       = m_drive.getFieldRelativeSpeeds();
@@ -73,10 +73,10 @@ public class ShootWhileMoving extends Command {
         Rotation2d fieldRelativeTarget  = robotToVirtual.getAngle();
         Rotation2d robotRotation        = robotPose.getRotation();
         Rotation2d turretTarget         = fieldRelativeTarget.minus(robotRotation);
-        double targetRPM                = isPassing ? m_shooter.getPassRPM(virtualDistance) :
-                                                        m_shooter.getHubRPM(virtualDistance);
-        double targetHood               = isPassing ? m_shooter.getPassHoodAngle(virtualDistance) :
-                                                        m_shooter.getHubHoodAngle(virtualDistance);
+        double targetRPM                = isPassing ? m_shooter.getPassParameters(virtualDistance).rpm() :
+                                                        m_shooter.getHubParameters(virtualDistance).rpm();
+        double targetHood               = isPassing ? m_shooter.getPassParameters(virtualDistance).hoodAngle() :
+                                                        m_shooter.getHubParameters(virtualDistance).hoodAngle();
 
         // Set Subsystem Targets
         m_turret.setTargetAngle(turretTarget);

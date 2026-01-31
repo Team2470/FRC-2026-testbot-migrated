@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.wpilibj.DriverStation;
 
 public class Constants {
@@ -96,78 +97,60 @@ public class Constants {
         // TODO: grab coordinates of Center of Turret compared to our robot's origin point (typically in the center of our bellypan)
         public static final Transform3d ROBOT_TO_TURRET = new Transform3d(-1.0, 0.0, 0.44, Rotation3d.kZero);
 
-        public static InterpolatingDoubleTreeMap HUB_RPM_MAP    = new InterpolatingDoubleTreeMap();
-        public static InterpolatingDoubleTreeMap HUB_HOOD_MAP   = new InterpolatingDoubleTreeMap();
-        public static InterpolatingDoubleTreeMap HUB_TOF_MAP    = new InterpolatingDoubleTreeMap();
-        public static InterpolatingDoubleTreeMap PASS_RPM_MAP   = new InterpolatingDoubleTreeMap();
-        public static InterpolatingDoubleTreeMap PASS_HOOD_MAP  = new InterpolatingDoubleTreeMap();
-        public static InterpolatingDoubleTreeMap PASS_TOF_MAP   = new InterpolatingDoubleTreeMap();
+        // Record to easily store parameters for shoot on the move
+        public record SHOOTER_PARAMETERS(double rpm, double hoodAngle, double timeOfFlight){}
+
+        public static InterpolatingTreeMap<Double, SHOOTER_PARAMETERS> HUB_MAP  = new InterpolatingTreeMap<Double, SHOOTER_PARAMETERS>(null, null);
+        public static InterpolatingTreeMap<Double, SHOOTER_PARAMETERS> PASS_MAP = new InterpolatingTreeMap<Double, SHOOTER_PARAMETERS>(null, null);
 
         public void ShooterInterpolation() {
-            // TODO: Actually test for these values.
-            // Initial values are based on using desmos Trajectory Calculator
-            // And do not reflect real-world-values
+            // TODO: Get good values for passing
+            PASS_MAP.put( 1.000, new SHOOTER_PARAMETERS(1500.000, 30.000, 0.800));
+            PASS_MAP.put( 2.000, new SHOOTER_PARAMETERS(2000.000, 30.000, 0.900));
+            // PASS_MAP.put( 1.000, new SHOOTER_PARAMETERS(RPM, HOOD_ANGLE, TIME_OF_FLIGHT));
+            // PASS_MAP.put( 2.000, new SHOOTER_PARAMETERS(RPM, HOOD_ANGLE, TIME_OF_FLIGHT));
+            // PASS_MAP.put( 3.000, new SHOOTER_PARAMETERS(RPM, HOOD_ANGLE, TIME_OF_FLIGHT));
+            // PASS_MAP.put( 4.000, new SHOOTER_PARAMETERS(RPM, HOOD_ANGLE, TIME_OF_FLIGHT));
+            // PASS_MAP.put( 5.000, new SHOOTER_PARAMETERS(RPM, HOOD_ANGLE, TIME_OF_FLIGHT));
+            // PASS_MAP.put( 6.000, new SHOOTER_PARAMETERS(RPM, HOOD_ANGLE, TIME_OF_FLIGHT));
+            // PASS_MAP.put( 7.000, new SHOOTER_PARAMETERS(RPM, HOOD_ANGLE, TIME_OF_FLIGHT));
+            // PASS_MAP.put( 8.000, new SHOOTER_PARAMETERS(RPM, HOOD_ANGLE, TIME_OF_FLIGHT));
+            // PASS_MAP.put( 9.000, new SHOOTER_PARAMETERS(RPM, HOOD_ANGLE, TIME_OF_FLIGHT));
+            // PASS_MAP.put(10.000, new SHOOTER_PARAMETERS(RPM, HOOD_ANGLE, TIME_OF_FLIGHT));
+            // PASS_MAP.put(11.000, new SHOOTER_PARAMETERS(RPM, HOOD_ANGLE, TIME_OF_FLIGHT));
+            // PASS_MAP.put(12.000, new SHOOTER_PARAMETERS(RPM, HOOD_ANGLE, TIME_OF_FLIGHT));
+            // PASS_MAP.put(13.000, new SHOOTER_PARAMETERS(RPM, HOOD_ANGLE, TIME_OF_FLIGHT));
 
-            // This map is for the shooter flywheel
-            // when we are shooting into hub
-            // Distance (meters), Flywheel Speed (RPM)
-            // Grabbed from basic test from 1/26 Practice on proto-shooter
-            HUB_RPM_MAP.put(2.286, 2940.000);
-            HUB_RPM_MAP.put(3.962, 3420.000);
-            // Min HUB shot distance (Mid robot - Mid HUB):
-            // 0.945 meters -> TODO: TEST THIS VALUE
-            // Max HUB shot distance (Mid robot - Mid HUB):
-            // 5.600 meters -> TODO: TEST THIS VALUE
-
-            // This map is for the Hood angle
-            // when we are shooting into hub
-            // Distance (meters), Hood Angle (degrees)
-            HUB_HOOD_MAP.put(3.993, 52.000);
-            HUB_HOOD_MAP.put(3.048, 67.000);
-            HUB_HOOD_MAP.put(2.438, 65.000);
-            HUB_HOOD_MAP.put(1.829, 72.000);
-            HUB_HOOD_MAP.put(1.219, 80.000);
-
-            // This map is time of flight in seconds
-            // when we are shooting into hub
-            // Distance (meters), Time of Flight (Seconds)
-            HUB_TOF_MAP.put(3.993, 1.900);
-            HUB_TOF_MAP.put(3.048, 1.600);
-            HUB_TOF_MAP.put(2.438, 1.200);
-            HUB_TOF_MAP.put(1.829, 1.000);
-            HUB_TOF_MAP.put(1.219, 0.900);
-
-            // This map is for the shooter flywheel
-            // when we are passing into alliance zone
-            // Distance (meters), Flywheel Speed (RPM)
-            PASS_RPM_MAP.put(1.524, 3539.700);
-            PASS_RPM_MAP.put(3.048, 4601.610);
-            PASS_RPM_MAP.put(6.096, 6902.415);
-            PASS_RPM_MAP.put(7.620, 7079.400);
-            PASS_RPM_MAP.put(9.144, 6725.430);
-            PASS_RPM_MAP.put(11.280,7256.385);
-            // Max Pass distance (Mid robot - Pass Location):
-            // 12.650 meters -> TODO: TEST THIS VALUE
-
-            // This map is for the Hood angle
-            // when we are passing into alliance zone
-            // Distance (meters), Hood Angle (degrees)
-            PASS_HOOD_MAP.put(1.524, 40.0);
-            PASS_HOOD_MAP.put(3.048, 30.0);
-            PASS_HOOD_MAP.put(6.096, 18.0);
-            PASS_HOOD_MAP.put(7.620, 23.0);
-            PASS_HOOD_MAP.put(9.144, 30.0);
-            PASS_HOOD_MAP.put(11.280, 35.0);
-
-            // This map is time of flight in seconds
-            // when we are passing into alliance zone
-            // Distance (meters), Time of Flight (Seconds)
-            PASS_TOF_MAP.put(1.524, 1.000);
-            PASS_TOF_MAP.put(3.048, 1.200);
-            PASS_TOF_MAP.put(6.096, 1.400);
-            PASS_TOF_MAP.put(7.620, 1.600);
-            PASS_TOF_MAP.put(9.144, 1.900);
-            PASS_TOF_MAP.put(11.280, 2.400);
+            // TODO: Get good values for the HUB
+            // Only values tested for so far: rpm at 7.5 and 13 feet (2.286 and 3.962 meters respectively)
+            // Distance from front of shooter to front of HUB
+            HUB_MAP.put(2.286, new SHOOTER_PARAMETERS(2940.000, 30.000, 1.100));
+            HUB_MAP.put(3.962, new SHOOTER_PARAMETERS(3420.000, 30.000, 1.900));
+            // 0.500 Meters ( 1.640 feet)
+            // HUB_MAP.put(0.500, new SHOOTER_PARAMETERS(RPM, HOOD_ANGLE, TIME_OF_FLIGHT));
+            // 1.000 Meters ( 3.281 feet)
+            // HUB_MAP.put(1.000, new SHOOTER_PARAMETERS(RPM, HOOD_ANGLE, TIME_OF_FLIGHT));
+            // 1.500 Meters ( 4.921 feet)
+            // HUB_MAP.put(1.500, new SHOOTER_PARAMETERS(RPM, HOOD_ANGLE, TIME_OF_FLIGHT));
+            // 2.000 Meters ( 6.562 feet)
+            // HUB_MAP.put(2.000, new SHOOTER_PARAMETERS(RPM, HOOD_ANGLE, TIME_OF_FLIGHT));
+            // 2.500 Meters ( 8.202 feet)
+            // HUB_MAP.put(2.500, new SHOOTER_PARAMETERS(RPM, HOOD_ANGLE, TIME_OF_FLIGHT));
+            // 3.000 Meters ( 9.843 feet)
+            // HUB_MAP.put(3.000, new SHOOTER_PARAMETERS(RPM, HOOD_ANGLE, TIME_OF_FLIGHT));
+            // 3.500 Meters (11.483 feet)
+            // HUB_MAP.put(3.500, new SHOOTER_PARAMETERS(RPM, HOOD_ANGLE, TIME_OF_FLIGHT));
+            // 4.000 Meters (13.123 feet)
+            // HUB_MAP.put(4.000, new SHOOTER_PARAMETERS(RPM, HOOD_ANGLE, TIME_OF_FLIGHT));
+            // 4.500 Meters (14.764 feet)
+            // HUB_MAP.put(4.500, new SHOOTER_PARAMETERS(RPM, HOOD_ANGLE, TIME_OF_FLIGHT));
+            // 5.000 Meters (16.404 feet)
+            // HUB_MAP.put(5.000, new SHOOTER_PARAMETERS(RPM, HOOD_ANGLE, TIME_OF_FLIGHT));
+            // 5.500 Meters (18.045 feet)
+            // HUB_MAP.put(5.500, new SHOOTER_PARAMETERS(RPM, HOOD_ANGLE, TIME_OF_FLIGHT));
+            // 6.000 Meters (19.685 feet)
+            // Just past real max value of shooting inside alliance zone
+            // HUB_MAP.put(6.000, new SHOOTER_PARAMETERS(RPM, HOOD_ANGLE, TIME_OF_FLIGHT));
         }
     }
 
