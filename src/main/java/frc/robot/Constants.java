@@ -123,6 +123,7 @@ public class Constants {
 
             // TODO: Get good values for the HUB
             // Only values tested for so far: rpm at 7.5 and 13 feet (2.286 and 3.962 meters respectively)
+            //                                HOOD_ANGLE AND TIME_OF_FLIGHT NOT TESTED FOR
             // Distance from front of shooter to front of HUB
             HUB_MAP.put(2.286, new SHOOTER_PARAMETERS(2940.000, 30.000, 1.100));
             HUB_MAP.put(3.962, new SHOOTER_PARAMETERS(3420.000, 30.000, 1.900));
