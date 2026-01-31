@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.LinearServo;
+import frc.robot.subsystems.Hood;
 
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -35,7 +35,7 @@ public class RobotContainer {
 
     private final CommandXboxController joystick = new CommandXboxController(0);
 
-    private final LinearServo linearServo = new LinearServo(0, 100, 32);
+    private final Hood linearServo = new Hood();
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
@@ -43,9 +43,9 @@ public class RobotContainer {
         configureBindings();
     }
 
-    public void periodic() {
-        linearServo.updateCurPos();
-    }
+    /*  public void periodic() {
+        Hood.periodic();
+    } Is this nessesary if there's a periodic in the Hood class? */
     
     private void configureBindings() {
         // Note that X is defined as forward according to WPILib convention,
