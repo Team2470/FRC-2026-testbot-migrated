@@ -1,13 +1,10 @@
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Millimeters;
-import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Value;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Servo;
@@ -19,12 +16,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.shooterConstants;
 
 public class Hood extends SubsystemBase {
-    private static final Distance kServoLength = Millimeters.of(100);
-    private static final LinearVelocity kMaxServoSpeed = Millimeters.of(20).per(Second);
-    private static final double kMinPosition = 0.01;
-    private static final double kMaxPosition = 0.77;
-    private static final double kPositionTolerance = 0.01;
-
     private final Servo leftServo;
     private final Servo rightServo;
 
@@ -45,10 +36,32 @@ public class Hood extends SubsystemBase {
 
     /** Expects a position between 0.0 and 1.0 */
     public void setPosition(double position) {
-        final double clampedPosition = MathUtil.clamp(position, kMinPosition, kMaxPosition);
+        final double clampedPosition = MathUtil.clamp(position,
+                                                        shooterConstants.MIN_HOOD_POSITION,
+                                                        shooterConstants.MAX_HOOD_POSITION);
         leftServo.set(clampedPosition);
         rightServo.set(clampedPosition);
         targetPosition = clampedPosition;
+    }
+
+    public void setAngle(double degrees) {
+        double clampedDegrees = MathUtil.clamp(degrees,
+                                                shooterConstants.MIN_HOOD_ANGLE,
+                                                shooterConstants.MAX_HOOD_ANGLE);
+
+        // This math assumes that extending the hood servos and resulting launch angle is a linear relationship
+        // ratio is percentage the requested angle is in the range the hood can accomplish
+        // Example:
+        // Min Hood Angle:  25 degrees
+        // Max Hood Angle:  75 degrees
+        // Requested Angle: 45 degrees
+        //     20          50
+        // (45 - 25) / (75 - 25) = .40
+        // 1 - 0.40 = 0.60 <- This step is required since Max Hood Angle = Min Hood Position
+        double ratio = 1 - ((clampedDegrees - shooterConstants.MIN_HOOD_ANGLE) /
+                        (shooterConstants.MAX_HOOD_ANGLE - shooterConstants.MIN_HOOD_ANGLE));
+        double position = 1 - ratio;
+        setPosition(position);
     }
 
     /** Expects a position between 0.0 and 1.0 */
@@ -58,7 +71,7 @@ public class Hood extends SubsystemBase {
     }
 
     public boolean isPositionWithinTolerance() {
-        return MathUtil.isNear(targetPosition, currentPosition, kPositionTolerance);
+        return MathUtil.isNear(targetPosition, currentPosition, shooterConstants.HOOD_TOLERANCE);
     }
 
     private void updateCurrentPosition() {
@@ -71,8 +84,8 @@ public class Hood extends SubsystemBase {
             return;
         }
 
-        final Distance maxDistanceTraveled = kMaxServoSpeed.times(elapsedTime);
-        final double maxPercentageTraveled = maxDistanceTraveled.div(kServoLength).in(Value);
+        final Distance maxDistanceTraveled = shooterConstants.HOOD_SPEED.times(elapsedTime);
+        final double maxPercentageTraveled = maxDistanceTraveled.div(shooterConstants.HOOD_LENGTH).in(Value);
         currentPosition = targetPosition > currentPosition
             ? Math.min(targetPosition, currentPosition + maxPercentageTraveled)
             : Math.max(targetPosition, currentPosition - maxPercentageTraveled);

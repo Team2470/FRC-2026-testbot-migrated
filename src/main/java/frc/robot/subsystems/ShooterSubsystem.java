@@ -1,9 +1,10 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.controls.Follower;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.shooterConstants;
@@ -43,12 +44,7 @@ public ShooterSubsystem() {
     }
 
     public void setHoodAngle(double degrees) {
-        double clamped      = Math.max(shooterConstants.MIN_HOOD_ANGLE,
-                                Math.min(shooterConstants.MAX_HOOD_ANGLE, degrees));
-        double rotations    = (clamped / 360.0) * shooterConstants.HOOD_LENGTH_TO_ANGLE_RATIO;
-
-        double rotations_to_servo_pose = rotations / (2 * Math.PI); // TODO: fix math for ratio of servo position to hood angle
-        m_hood.setPosition(rotations_to_servo_pose);
+        m_hood.setAngle(degrees);
     }
 
     public void setRPM(double rpm) {
@@ -65,13 +61,8 @@ public ShooterSubsystem() {
         return Math.abs(currentRPM - targetRPM) < tolerance;
     }
 
-    public boolean isHoodOnTarget(double targetDegrees, double tolerance) {
-        double currentHoodPose = m_hood.getPosition();
-        double currentRot = currentHoodPose * 2 * Math.PI; // TODO: fix math for ratio of servo position to hood angle
-        double currentDeg = (currentRot / shooterConstants.HOOD_LENGTH_TO_ANGLE_RATIO) * 360.0;
-
-        // Tolerance: Is Current Angle = Target Angle +/- Tolerance (measured in Degrees)
-        return Math.abs(currentDeg - targetDegrees) < tolerance;
+    public boolean isHoodOnTarget() {
+        return m_hood.isPositionWithinTolerance();
     }
 
     // Input: RPM of the main flywheel

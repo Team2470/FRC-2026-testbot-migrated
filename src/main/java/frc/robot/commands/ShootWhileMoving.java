@@ -44,7 +44,6 @@ public class ShootWhileMoving extends Command {
         robotPose                   = m_drive.getPose();
         if(isPassing) {
             turretToleranceDegrees  = shooterConstants.TURRET_PASS_TOLERANCE;
-            hoodToleranceDegrees    = shooterConstants.HOOD_PASS_TOLERANCE;
             flywheelToleranceRPM    = shooterConstants.RPM_PASS_TOLERANCE;
             // Find how far from each of 2 passing spots the robot is
             robotToPassLeft         = fieldConstants.PASS_LEFT_LOCATION.minus(robotPose.getTranslation()).getNorm();
@@ -54,7 +53,6 @@ public class ShootWhileMoving extends Command {
                                                                                 fieldConstants.PASS_RIGHT_LOCATION;
         } else {
             turretToleranceDegrees  = shooterConstants.TURRET_HUB_TOLERANCE;
-            hoodToleranceDegrees    = shooterConstants.HOOD_HUB_TOLERANCE;
             flywheelToleranceRPM    = shooterConstants.RPM_HUB_TOLERANCE;
             // Vector math to get basic distance (without including moving)
             target_location         = fieldConstants.HUB_LOCATION;
@@ -97,7 +95,7 @@ public class ShootWhileMoving extends Command {
         // Unleash fuel into turret
         if (m_turret.isOnTarget(turretTarget, turretToleranceDegrees)
             && m_shooter.isAtSpeed(targetRPM, flywheelToleranceRPM)
-            && m_shooter.isHoodOnTarget(targetHood, hoodToleranceDegrees)) {
+            && m_shooter.isHoodOnTarget()) {
             m_shooter.runFeeder(shooterConstants.FEEDER_RUN);
         }
         else {

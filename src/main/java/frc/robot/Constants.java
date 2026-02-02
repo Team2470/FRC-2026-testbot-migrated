@@ -1,11 +1,16 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Millimeters;
+import static edu.wpi.first.units.Units.Second;
+
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 
 public class Constants {
@@ -55,14 +60,15 @@ public class Constants {
         // Hood Constants
         public static final int LEFT_HOOD_DEVICE_ID                     = 3;
         public static final int RIGHT_HOOD_DEVICE_ID                    = 4;
-        public static final double HOOD_LENGTH_TO_ANGLE_RATIO           = 50.0; // Servo has position from 0 to 1, we need to convert that to the full range of motion in degrees
-        public static final double MIN_HOOD_ANGLE                       = 15.0;
-        public static final double MAX_HOOD_ANGLE                       = 85.0;
-        public static final double MIN_HOOD_SOFT_LIMIT                  = MIN_HOOD_ANGLE / 360.0 * HOOD_LENGTH_TO_ANGLE_RATIO;
-        public static final double MAX_HOOD_SOFT_LIMIT                  = MAX_HOOD_ANGLE / 360.0 * HOOD_LENGTH_TO_ANGLE_RATIO;
+        public static final double MIN_HOOD_ANGLE                       = 35.0;
+        public static final double MAX_HOOD_ANGLE                       = 63.0;
+        public static final double MIN_HOOD_POSITION                    = 0.01;
+        public static final double MAX_HOOD_POSITION                    = 0.99;
         public static final double HOOD_KP                              = 20.0;
         public static final double HOOD_KI                              = 0.0;
         public static final double HOOD_KD                              = 0.0;
+        public static final LinearVelocity HOOD_SPEED                   = Millimeters.of(20).per(Second);
+        public static final Distance HOOD_LENGTH                        = Millimeters.of(100);
 
         // Turret Constants
         public static final int TURRET_DEVICE_ID                        = 0;
@@ -92,8 +98,7 @@ public class Constants {
         // "the best" balance of speed and accuracy
         public static final double TURRET_PASS_TOLERANCE                = 3.0;
         public static final double TURRET_HUB_TOLERANCE                 = 1.0;
-        public static final double HOOD_PASS_TOLERANCE                  = 3.0;
-        public static final double HOOD_HUB_TOLERANCE                   = 1.0;
+        public static final double HOOD_TOLERANCE                       = 0.01;
         public static final double RPM_PASS_TOLERANCE                   = 300;
         public static final double RPM_HUB_TOLERANCE                    = 100;
 
@@ -108,8 +113,8 @@ public class Constants {
 
         public void ShooterInterpolation() {
             // TODO: Get good values for passing
-            PASS_MAP.put( 1.000, new SHOOTER_PARAMETERS(1500.000, 30.000, 0.800));
-            PASS_MAP.put( 2.000, new SHOOTER_PARAMETERS(2000.000, 30.000, 0.900));
+            PASS_MAP.put( 1.000, new SHOOTER_PARAMETERS(1500.000, 35.000, 0.800));
+            PASS_MAP.put( 2.000, new SHOOTER_PARAMETERS(2000.000, 35.000, 0.900));
             // PASS_MAP.put( 1.000, new SHOOTER_PARAMETERS(RPM, HOOD_ANGLE, TIME_OF_FLIGHT));
             // PASS_MAP.put( 2.000, new SHOOTER_PARAMETERS(RPM, HOOD_ANGLE, TIME_OF_FLIGHT));
             // PASS_MAP.put( 3.000, new SHOOTER_PARAMETERS(RPM, HOOD_ANGLE, TIME_OF_FLIGHT));
@@ -128,8 +133,8 @@ public class Constants {
             // Only values tested for so far: rpm at 7.5 and 13 feet (2.286 and 3.962 meters respectively)
             //                                HOOD_ANGLE AND TIME_OF_FLIGHT NOT TESTED FOR
             // Distance from front of shooter to front of HUB
-            HUB_MAP.put(2.286, new SHOOTER_PARAMETERS(2940.000, 30.000, 1.100));
-            HUB_MAP.put(3.962, new SHOOTER_PARAMETERS(3420.000, 30.000, 1.900));
+            HUB_MAP.put(2.286, new SHOOTER_PARAMETERS(2940.000, 35.000, 1.100));
+            HUB_MAP.put(3.962, new SHOOTER_PARAMETERS(3420.000, 35.000, 1.900));
             // 0.500 Meters ( 1.640 feet)
             // HUB_MAP.put(0.500, new SHOOTER_PARAMETERS(RPM, HOOD_ANGLE, TIME_OF_FLIGHT));
             // 1.000 Meters ( 3.281 feet)

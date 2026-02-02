@@ -98,7 +98,7 @@ public class RobotContainer {
 
         // Shoot at Hub while moving
         joystick.rightTrigger()
-        .whileTrue(new ShootWhileMoving(drivetrain, turret, shooter, false));
+            .whileTrue(new ShootWhileMoving(drivetrain, turret, shooter, false));
 
         // Pass to Alliance zone while moving
         joystick.leftTrigger()
