@@ -275,7 +275,7 @@ public class Shooter extends SubsystemBase {
 public Command runShooterCommand(){
     return Commands.runEnd(
         () -> {
-            this.setRPM(50);
+            this.setRPM(500);
         },
         () -> { this.setRPM(0);}, this);
     }

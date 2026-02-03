@@ -19,9 +19,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Hood extends SubsystemBase {
     private static final Distance kServoLength = Millimeters.of(100);
-    private static final LinearVelocity kMaxServoSpeed = Millimeters.of(20).per(Second);
+    private static final LinearVelocity kMaxServoSpeed = Millimeters.of(30).per(Second);
     private static final double kMinPosition = 0.01;
-    private static final double kMaxPosition = 0.77;
+    private static final double kMaxPosition = 0.99;
     private static final double kPositionTolerance = 0.01;
     private int Channel = 0;
     private final Servo testServo;
@@ -46,11 +46,11 @@ public class Hood extends SubsystemBase {
 
     
     public void extendActuator() {
-        setPosition(currentPosition + 0.1);
+        setPosition(currentPosition + 0.05);
     }
 
     public void retractActuator() {
-        setPosition(currentPosition - 0.1);
+        setPosition(currentPosition - 0.05);
     }
 
     /** Expects a position between 0.0 and 1.0 */
