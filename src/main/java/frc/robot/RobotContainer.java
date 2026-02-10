@@ -21,11 +21,12 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Shooter;
 import frc.robot.commands.ShootWhileMoving;
 import frc.robot.subsystems.Hood;
+import frc.robot.subsystems.Turret;
 
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
-
+    private Rotation2d turretAngle = Rotation2d.fromRadians(0);
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
             .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
@@ -42,6 +43,8 @@ public class RobotContainer {
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     public final Shooter shooter = new Shooter();
+    
+    public final Turret turret = new Turret();
     
     public RobotContainer() {
         configureBindings();
@@ -88,7 +91,9 @@ public class RobotContainer {
         joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
         // reset the field-centric heading on left bumper press
-        joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        // joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        joystick.leftBumper().whileTrue(turret.runTurretCommand(1));
+        joystick.rightBumper().whileTrue(turret.runTurretCommand(-1));
         joystick.rightTrigger().whileTrue(shooter.runShooterCommand());
         drivetrain.registerTelemetry(logger::telemeterize);
     }

@@ -4,6 +4,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.CANdi;
 import com.ctre.phoenix6.hardware.ParentDevice;
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.controls.*;
 import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.StatusCode;
@@ -34,7 +35,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import com.ctre.phoenix6.hardware.TalonFX;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
@@ -45,17 +45,16 @@ import frc.robot.Constants.shooterConstants;
 
 public class Shooter extends SubsystemBase {
 
-     private final TalonFX m_topMotor_1                      = new TalonFX(shooterConstants.FLYWHEEL_1_DEVICE_ID);
-    private final TalonFX m_topMotor_2                      = new TalonFX(shooterConstants.FLYWHEEL_2_DEVICE_ID);
+    private final TalonFX m_topMotor_1 = new TalonFX(shooterConstants.FLYWHEEL_1_DEVICE_ID);
+    private final TalonFX m_topMotor_2 = new TalonFX(shooterConstants.FLYWHEEL_2_DEVICE_ID);
     // private final TalonFX m_feederMotor                     = new TalonFX(shooterConstants.FEEDER_DEVICE_ID);
     // private final TalonFX m_hoodMotor                       = new TalonFX(shooterConstants.HOOD_DEVICE_ID); 
     private final VelocityVoltage m_velocityRequest         = new VelocityVoltage(0);
 
     // private final TalonFX m_motor;
-    // private final CANcoder m_encoder;
     // //placeholder constants for PID
-    // private double m_demand;
-    // private final PIDController m_pidController = new PIDController(shooterConstants.FLYWHEEL_KP, shooterConstants.FLYWHEEL_KI, shooterConstants.FLYWHEEL_KD);
+    private double m_demand;
+    // private finasl PIDController m_pidController = new PIDController(shooterConstants.FLYWHEEL_KP, shooterConstants.FLYWHEEL_KI, shooterConstants.FLYWHEEL_KD);
 
 
     private enum ControlMode {
@@ -192,6 +191,7 @@ public class Shooter extends SubsystemBase {
 //     }
     
 
+
 // public double getErrorRPM(){
 // 	if (m_controlMode == ControlMode.kPID){
 // 	return m_pidController.getPositionError();
@@ -202,19 +202,19 @@ public class Shooter extends SubsystemBase {
 // public double getErrorPercent(){
 // 	if (m_controlMode == ControlMode.kPID) {
 // 	return (m_demand - m_encoder.getVelocity().getValueAsDouble()) / m_demand * 10;
-// 	}
+//   }
 
-// 	return 0;
+//  	return 0;
 // }
 // public boolean isErrorInRange() {
 // 	return (-4 < this.getErrorPercent() && this.getErrorPercent() < 4);
 // }
 
-// 	public boolean isErrorBelow() {
-// 	return (-5 > this.getErrorPercent());
+// public boolean isErrorBelow() {
+//     return (-5 > this.getErrorPercent());
 // }
 
-// 	public boolean isErrorAbove() {
+// public boolean isErrorAbove() {
 // 	return (this.getErrorPercent() > 5);
 // }
 
