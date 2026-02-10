@@ -81,7 +81,7 @@ public class ShootWhileMoving extends Command {
         // Set Subsystem Targets
        // m_turret.setTargetAngle(turretTarget);
        // m_shooter.setRPM(targetRPM);
-       m_shooter.setRPM(500);
+       m_shooter.setRPM(1000);
        // m_shooter.setHoodAngle(targetHood);
 
         // Once Turret and shooter are at the correct set points

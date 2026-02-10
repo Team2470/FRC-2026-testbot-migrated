@@ -54,6 +54,8 @@ public class Shooter extends SubsystemBase {
     // private final TalonFX m_motor;
     // //placeholder constants for PID
     private double m_demand;
+    private double targetRPM = 500;
+    private double distance = 1.3;
     // private finasl PIDController m_pidController = new PIDController(shooterConstants.FLYWHEEL_KP, shooterConstants.FLYWHEEL_KI, shooterConstants.FLYWHEEL_KD);
 
 
@@ -82,6 +84,7 @@ public class Shooter extends SubsystemBase {
         m_topMotor_2.optimizeBusUtilization();
         m_topMotor_2.setControl(new Follower(m_topMotor_1.getDeviceID(), shooterConstants.FLYWHEEL_ALIGNMENT_VALUE));
 
+        SmartDashboard.putNumber("Distance", distance);
        
     }public double getHubRPM(double distance) {
         return shooterConstants.HUB_RPM_MAP.get(distance);
@@ -272,12 +275,49 @@ public class Shooter extends SubsystemBase {
 // public Command pidCommand(double rpm){
 // 	return pidCommand(() -> rpm);
 // }
+
+
+// public Command runShooterCommand(){
+//     return Commands.runEnd(
+//         () -> {
+//             this.setRPM(targetRPM);
+//         },
+//         () -> { this.setRPM(0);}, this);
+//     }
 public Command runShooterCommand(){
     return Commands.runEnd(
         () -> {
-            this.setRPM(500);
+            this.setRPM(this.getHubRPM(this.distance));
         },
         () -> { this.setRPM(0);}, this);
     }
-}
 
+public Command increaseRPM(){
+    return Commands.runOnce(
+            () -> {
+                this.targetRPM += 500;
+            }, this);
+} 
+
+public Command decreaseRPM(){
+    return Commands.runOnce(
+            () -> {
+                this.targetRPM -= 500;
+            }, this);
+} 
+
+public Command increaseDistance(){
+    return Commands.runOnce(
+            () -> {
+                this.distance += .05;
+            }, this);
+} 
+
+public Command decreaseDistance(){
+    return Commands.runOnce(
+            () -> {
+                this.distance -= .05;
+            }, this);
+} 
+
+}
