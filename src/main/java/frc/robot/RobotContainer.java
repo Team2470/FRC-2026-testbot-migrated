@@ -43,9 +43,9 @@ public class RobotContainer {
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     public final Shooter shooter = new Shooter();
-    
+
     public final Turret turret = new Turret();
-    
+
     public RobotContainer() {
         configureBindings();
     }
@@ -53,7 +53,7 @@ public class RobotContainer {
     /*  public void periodic() {
         Hood.periodic();
     } Is this nessesary if there's a periodic in the Hood class? */
-    
+
     private void configureBindings() {
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
@@ -80,8 +80,8 @@ public class RobotContainer {
 
         // joystick.x().whileTrue(Commands.runOnce(() -> linearServo.extendActuator()));
         // joystick.y().whileTrue(Commands.runOnce(() -> linearServo.retractActuator()));
-        joystick.y().whileTrue(shooter.increaseDistance());
-        joystick.x().whileTrue(shooter.decreaseDistance());
+        joystick.y().whileTrue(shooter.runOnce(() -> shooter.increaseDistance()));
+        joystick.x().whileTrue(shooter.runOnce(() -> shooter.decreaseDistance()));
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.

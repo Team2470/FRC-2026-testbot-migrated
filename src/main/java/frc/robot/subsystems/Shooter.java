@@ -48,14 +48,14 @@ public class Shooter extends SubsystemBase {
     private final TalonFX m_topMotor_1 = new TalonFX(shooterConstants.FLYWHEEL_1_DEVICE_ID);
     private final TalonFX m_topMotor_2 = new TalonFX(shooterConstants.FLYWHEEL_2_DEVICE_ID);
     // private final TalonFX m_feederMotor                     = new TalonFX(shooterConstants.FEEDER_DEVICE_ID);
-    // private final TalonFX m_hoodMotor                       = new TalonFX(shooterConstants.HOOD_DEVICE_ID); 
+    // private final TalonFX m_hoodMotor                       = new TalonFX(shooterConstants.HOOD_DEVICE_ID);
     private final VelocityVoltage m_velocityRequest         = new VelocityVoltage(0);
 
     // private final TalonFX m_motor;
     // //placeholder constants for PID
     private double m_demand;
-    private double targetRPM = 500;
-    private double distance = 1.3;
+    public double targetRPM = 500;
+    public double distance = 1.3;
     // private finasl PIDController m_pidController = new PIDController(shooterConstants.FLYWHEEL_KP, shooterConstants.FLYWHEEL_KI, shooterConstants.FLYWHEEL_KD);
 
 
@@ -64,28 +64,29 @@ public class Shooter extends SubsystemBase {
     }
 
     private ControlMode m_controlMode = ControlMode.kOpenLoop;
-    
-    
-    // formula for ballistic trajectory WITHOUT DRAG, change in the future to account for this if needed 
+
+
+    // formula for ballistic trajectory WITHOUT DRAG, change in the future to account for this if needed
     private Double angleCalculator(Double v,  Double x, Double y) {
         return(Math.atan((Math.pow(v, 2) + Math.sqrt(Math.pow(v, 4) - 9.8 * (9.8 * Math.pow(x,2) + 2 * y * Math.pow(v,2))))/ (9.8 * x)));
     }
-    
+
     public Shooter() {
-        
+
          TalonFXConfiguration config = new TalonFXConfiguration();
         // PID gains must be tuned for RPS (Phoenix 6 standard)
-        config.Slot0.kP = shooterConstants.FLYWHEEL_KP; 
-        config.Slot0.kI = shooterConstants.FLYWHEEL_KI; 
-        config.Slot0.kD = shooterConstants.FLYWHEEL_KD; 
-        config.Slot0.kV = shooterConstants.FLYWHEEL_KV; 
+        config.Slot0.kP = shooterConstants.FLYWHEEL_KP;
+        config.Slot0.kI = shooterConstants.FLYWHEEL_KI;
+        config.Slot0.kD = shooterConstants.FLYWHEEL_KD;
+        config.Slot0.kV = shooterConstants.FLYWHEEL_KV;
         m_topMotor_1.getConfigurator().apply(config);
         m_topMotor_2.getConfigurator().apply(config);
         m_topMotor_2.optimizeBusUtilization();
         m_topMotor_2.setControl(new Follower(m_topMotor_1.getDeviceID(), shooterConstants.FLYWHEEL_ALIGNMENT_VALUE));
 
         SmartDashboard.putNumber("Distance", distance);
-       
+        SmartDashboard.putNumber("TargetRPM", targetRPM);
+
     }public double getHubRPM(double distance) {
         return shooterConstants.HUB_RPM_MAP.get(distance);
     }
@@ -106,17 +107,17 @@ public class Shooter extends SubsystemBase {
     /*  public double getHubHoodAngle(double distance) {
          return shooterConstants.HOOD_HUB_MAP.get(distance);
      }
-    
+
      public double getPassHoodAngle(double distance) {
          return shooterConstants.HOOD_PASS_MAP.get(distance);
     }
 
     public void runFeeder(double speed) {
        m_feederMotor.set(speed);
-    } */ 
+    } */
 
 /*  public void setHoodAngle(double degrees) {
-        double clamped      = Math.max(shooterConstants.MIN_HOOD_ANGLE, 
+        double clamped      = Math.max(shooterConstants.MIN_HOOD_ANGLE,
                                 Math.min(shooterConstants.MAX_HOOD_ANGLE, degrees));
         double rotations    = (clamped / 360.0) * shooterConstants.HOOD_GEAR_RATIO;
 
@@ -133,7 +134,7 @@ public class Shooter extends SubsystemBase {
     public boolean isAtSpeed(double targetRPM, double tolerance) {
         // Get actual speed (Phoenix gives RPS), convert to RPM
         double currentRPM = m_topMotor_1.getVelocity().getValueAsDouble() * Constants.MINUTE_TO_SECONDS;
-        
+
         // Tolerance: Is Current RPM = Target RPM +/- Tolerance (measured in RPM)
         return Math.abs(currentRPM - targetRPM) < tolerance;
     }
@@ -141,8 +142,8 @@ public class Shooter extends SubsystemBase {
     // public boolean isHoodOnTarget(double targetDegrees, double tolerance) {
     //     double currentRot = m_hoodMotor.getPosition().getValueAsDouble();
     //     double currentDeg = (currentRot / shooterConstants.HOOD_GEAR_RATIO) * 360.0;
-        
-    //     // Tolerance: Is Current Angle = Target Angle +/- Tolerance (measured in Degrees) 
+
+    //     // Tolerance: Is Current Angle = Target Angle +/- Tolerance (measured in Degrees)
     //     return Math.abs(currentDeg - targetDegrees) < tolerance;
     // }
 
@@ -153,7 +154,7 @@ public class Shooter extends SubsystemBase {
     //     double topRPS       = mainRPS * shooterConstants.BACKSPIN_GEAR_RATIO;
     //     double mainSurface  = mainRPS * Math.PI * shooterConstants.FLYWHEEL_DIAMETER_METERS;
     //     double topSurface   = topRPS * Math.PI * shooterConstants.BACKSPIN_DIAMETER_METERS;
-        
+
     //     // The ball speed is roughly the average of the two contacting surfaces
     //     // Multiplied by efficiency (slip)
     //     return ((mainSurface + topSurface) / 2.0) * shooterConstants.SHOOTER_EFFICIENCY;
@@ -192,7 +193,7 @@ public class Shooter extends SubsystemBase {
 // 	// Publish to smart dashboard
 
 //     }
-    
+
 
 
 // public double getErrorRPM(){
@@ -284,40 +285,38 @@ public class Shooter extends SubsystemBase {
 //         },
 //         () -> { this.setRPM(0);}, this);
 //     }
-public Command runShooterCommand(){
-    return Commands.runEnd(
-        () -> {
-            this.setRPM(this.getHubRPM(this.distance));
-        },
-        () -> { this.setRPM(0);}, this);
+    public Command runShooterCommand(){
+        return Commands.runEnd(
+            () -> {
+                this.setRPM(targetRPM);
+            },
+            () -> { this.setRPM(0);}, this);
     }
 
-public Command increaseRPM(){
-    return Commands.runOnce(
+    public Command increaseRPM(){
+        return Commands.runOnce(
             () -> {
                 this.targetRPM += 500;
             }, this);
-} 
+    }
 
-public Command decreaseRPM(){
-    return Commands.runOnce(
+    public Command decreaseRPM(){
+        return Commands.runOnce(
             () -> {
                 this.targetRPM -= 500;
             }, this);
-} 
+    }
 
-public Command increaseDistance(){
-    return Commands.runOnce(
-            () -> {
-                this.distance += .05;
-            }, this);
-} 
+    public void increaseDistance(){
+        double newDistance  = this.distance + 0.05;
+        this.targetRPM      = getHubRPM(newDistance);
+        this.distance       = newDistance;
+    }
 
-public Command decreaseDistance(){
-    return Commands.runOnce(
-            () -> {
-                this.distance -= .05;
-            }, this);
-} 
+    public void decreaseDistance(){
+        double newDistance  = this.distance - 0.05;
+        this.targetRPM      = getHubRPM(newDistance);
+        this.distance       = newDistance;
+    }
 
 }
