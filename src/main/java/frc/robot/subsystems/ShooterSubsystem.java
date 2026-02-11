@@ -11,23 +11,23 @@ import frc.robot.Constants.shooterConstants;
 import frc.robot.Constants.shooterConstants.SHOOTER_PARAMETERS;
 
 public class ShooterSubsystem extends SubsystemBase {
-    private final TalonFX m_topMotor_1                      = new TalonFX(shooterConstants.FLYWHEEL_1_DEVICE_ID);
-    private final TalonFX m_topMotor_2                      = new TalonFX(shooterConstants.FLYWHEEL_2_DEVICE_ID);
-    private final TalonFX m_feederMotor                     = new TalonFX(shooterConstants.FEEDER_DEVICE_ID);
-    private final Hood m_hood                               = new Hood();
-    private final VelocityVoltage m_velocityRequest         = new VelocityVoltage(0);
+    private final TalonFX flywheelMotorOne              = new TalonFX(shooterConstants.FLYWHEEL_1_DEVICE_ID);
+    private final TalonFX flywheelMotorTwo              = new TalonFX(shooterConstants.FLYWHEEL_2_DEVICE_ID);
+    private final TalonFX feederMotor                   = new TalonFX(shooterConstants.FEEDER_DEVICE_ID);
+    private final Hood hood                             = new Hood();
+    private final VelocityVoltage m_velocityRequest     = new VelocityVoltage(0);
 
-public ShooterSubsystem() {
+    public ShooterSubsystem() {
         TalonFXConfiguration config = new TalonFXConfiguration();
         // PID gains must be tuned for RPS (Phoenix 6 standard)
         config.Slot0.kP = shooterConstants.FLYWHEEL_KP;
         config.Slot0.kI = shooterConstants.FLYWHEEL_KI;
         config.Slot0.kD = shooterConstants.FLYWHEEL_KD;
         config.Slot0.kV = shooterConstants.FLYWHEEL_KV;
-        m_topMotor_1.getConfigurator().apply(config);
-        m_topMotor_2.getConfigurator().apply(config);
-        m_topMotor_2.optimizeBusUtilization();
-        m_topMotor_2.setControl(new Follower(m_topMotor_1.getDeviceID(), shooterConstants.FLYWHEEL_ALIGNMENT_VALUE));
+        flywheelMotorOne.getConfigurator().apply(config);
+        flywheelMotorTwo.getConfigurator().apply(config);
+        flywheelMotorTwo.optimizeBusUtilization();
+        flywheelMotorTwo.setControl(new Follower(flywheelMotorOne.getDeviceID(), shooterConstants.FLYWHEEL_ALIGNMENT_VALUE));
 
     }
 
@@ -40,42 +40,42 @@ public ShooterSubsystem() {
     }
 
     public void runFeeder(double speed) {
-       m_feederMotor.set(speed);
+       feederMotor.set(speed);
     }
 
     public void setHoodAngle(double degrees) {
-        m_hood.setAngle(degrees);
+        hood.setAngle(degrees);
     }
 
     public void setRPM(double rpm) {
         // Phoenix sends values in Rotations Per Seconds (RPS)
         // Must handle value accordingly
-        m_topMotor_1.setControl(m_velocityRequest.withVelocity(rpm / Constants.SECONDS_PER_MINUTE));
+        flywheelMotorOne.setControl(m_velocityRequest.withVelocity(rpm / Constants.SECONDS_PER_MINUTE));
     }
 
     public boolean isAtSpeed(double targetRPM, double tolerance) {
         // Get actual speed (Phoenix gives RPS), convert to RPM
-        double currentRPM = m_topMotor_1.getVelocity().getValueAsDouble() * Constants.SECONDS_PER_MINUTE;
+        double currentRPM = flywheelMotorOne.getVelocity().getValueAsDouble() * Constants.SECONDS_PER_MINUTE;
 
         // Tolerance: Is Current RPM = Target RPM +/- Tolerance (measured in RPM)
         return Math.abs(currentRPM - targetRPM) < tolerance;
     }
 
     public boolean isHoodOnTarget() {
-        return m_hood.isPositionWithinTolerance();
+        return hood.isPositionWithinTolerance();
     }
 
     // Input: RPM of the main flywheel
     // Output: Ball's velocity coming out of shooter
     public double getExpectedExitVelocity(double mainRPM) {
-        double mainRPS      = mainRPM / Constants.SECONDS_PER_MINUTE;
-        double topRPS       = mainRPS * shooterConstants.BACKSPIN_GEAR_RATIO;
-        double mainSurface  = mainRPS * Math.PI * shooterConstants.FLYWHEEL_DIAMETER_METERS;
-        double topSurface   = topRPS * Math.PI * shooterConstants.BACKSPIN_DIAMETER_METERS;
+        double mainRPS          = mainRPM / Constants.SECONDS_PER_MINUTE;
+        double backspinRPS      = mainRPS * shooterConstants.BACKSPIN_GEAR_RATIO;
+        double mainSurface      = mainRPS * Math.PI * shooterConstants.FLYWHEEL_DIAMETER_METERS;
+        double backspinSurface  = backspinRPS * Math.PI * shooterConstants.BACKSPIN_DIAMETER_METERS;
 
         // The ball speed is roughly the average of the two contacting surfaces
         // Multiplied by efficiency (slip)
-        return ((mainSurface + topSurface) / 2.0) * shooterConstants.SHOOTER_EFFICIENCY;
+        return ((mainSurface + backspinSurface) / 2.0) * shooterConstants.SHOOTER_EFFICIENCY;
     }
 
 }
