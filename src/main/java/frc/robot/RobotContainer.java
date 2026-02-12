@@ -22,6 +22,7 @@ import frc.robot.subsystems.Shooter;
 import frc.robot.commands.ShootWhileMoving;
 import frc.robot.subsystems.Hood;
 import frc.robot.subsystems.Turret;
+import frc.robot.subsystems.Intake;
 
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -39,7 +40,7 @@ public class RobotContainer {
     private final CommandXboxController joystick = new CommandXboxController(0);
 
     private final Hood linearServo = new Hood();
-
+    private final Intake intake = new Intake();
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     public final Shooter shooter = new Shooter();
@@ -79,9 +80,11 @@ public class RobotContainer {
         ));
 
 
-        joystick.x().whileTrue(Commands.runOnce(() -> linearServo.extendActuator()));
-        joystick.y().whileTrue(Commands.runOnce(() -> linearServo.retractActuator()));
-
+        //joystick.x().whileTrue(Commands.runOnce(() -> linearServo.extendActuator()));
+        //joystick.y().whileTrue(Commands.runOnce(() -> linearServo.retractActuator()));
+        // uncomment these for motor test and comment the ones above, vice versa to test linear actuator
+        joystick.x().whileTrue(Commands.runOnce(() -> intake.runMotor()));
+        joystick.y().whileTrue(Commands.runOnce(() -> intake.stopMotor()));
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
