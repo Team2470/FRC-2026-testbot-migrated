@@ -14,7 +14,6 @@ import frc.robot.subsystems.TurretSubsystem;
 
 public class ShootWhileMoving extends Command {
     private final CommandSwerveDrivetrain   m_drive;
-    private final TurretSubsystem           m_turret;
     private final ShooterSubsystem          m_shooter;
     private final boolean                   isPassing;
 
@@ -29,14 +28,12 @@ public class ShootWhileMoving extends Command {
 
 
     public ShootWhileMoving(CommandSwerveDrivetrain drive,
-                            TurretSubsystem turret,
                             ShooterSubsystem shooter,
                             boolean isPassing) {
         this.m_drive    = drive;
-        this.m_turret   = turret;
         this.m_shooter  = shooter;
         this.isPassing  = isPassing;
-        addRequirements(m_turret, m_shooter);
+        addRequirements(m_shooter);
     }
 
     // Initialized is used to grab constants depending on if we are passing or not
@@ -84,16 +81,16 @@ public class ShootWhileMoving extends Command {
         Rotation2d robotRotation        = robotPose.getRotation();
         Rotation2d turretTarget         = fieldRelativeTarget.minus(robotRotation);
         double targetRPM                = shotParams.rpm();
-        double targetHood               = shotParams.hoodAngle();
+        double targetHood               = shotParams.hoodPosition();
 
         // Set Subsystem Targets
-        m_turret.setTargetAngle(turretTarget);
+        m_shooter.setTurretAngle(turretTarget);
         m_shooter.setRPM(targetRPM);
-        m_shooter.setHoodAngle(targetHood);
+        m_shooter.setHoodPosition(targetHood);
 
         // Once Turret and shooter are at the correct set points
         // Unleash fuel into turret
-        if (m_turret.isOnTarget(turretTarget, turretToleranceDegrees)
+        if (m_shooter.isTurretOnTarget(turretTarget, turretToleranceDegrees)
             && m_shooter.isAtSpeed(targetRPM, flywheelToleranceRPM)
             && m_shooter.isHoodOnTarget()) {
             m_shooter.runFeeder(shooterConstants.FEEDER_RUN);

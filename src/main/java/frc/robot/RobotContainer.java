@@ -24,8 +24,8 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.ShootWhileMoving;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
-import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.limelightVision.LimelightHelpers;
 import frc.robot.subsystems.limelightVision.VisionApriltagSubsystem;
 import frc.robot.util.FieldObject;
@@ -33,7 +33,7 @@ import frc.robot.util.FieldObject;
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
-
+    private Rotation2d turretAngle = Rotation2d.fromRadians(0);
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
             .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
@@ -48,7 +48,7 @@ public class RobotContainer {
     private QuestNav questNav = new QuestNav();
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain((pose) -> questNav.resetPose(pose));
     public final ShooterSubsystem shooter = new ShooterSubsystem();
-    public final TurretSubsystem turret = new TurretSubsystem();
+    public final IntakeSubsystem intake = new IntakeSubsystem();
 
     StructPublisher<Pose2d> posePublisher =
         NetworkTableInstance.getDefault().getStructTopic("robotPose", Pose2d.struct).publish();
@@ -59,6 +59,10 @@ public class RobotContainer {
     public RobotContainer() {
         configureBindings();
     }
+
+    /*  public void periodic() {
+        Hood.periodic();
+    } Is this nessesary if there's a periodic in the Hood class? */
 
     private void configureBindings() {
         // Note that X is defined as forward according to WPILib convention,
@@ -84,6 +88,13 @@ public class RobotContainer {
             point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
         ));
 
+
+        //joystick.x().whileTrue(Commands.runOnce(() -> linearServo.extendActuator()));
+        //joystick.y().whileTrue(Commands.runOnce(() -> linearServo.retractActuator()));
+        // uncomment these for motor test and comment the ones above, vice versa to test linear actuator
+        joystick.x().whileTrue(intake.intakeCommand());
+        joystick.y().whileTrue(intake.outtakeCommand());
+
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
         joystick.back().and(joystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
@@ -92,17 +103,19 @@ public class RobotContainer {
         joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
         // reset the field-centric heading on left bumper press
-        joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
-
+        // joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        // joystick.leftBumper().whileTrue(turret.runTurretCommand(1));
+        // joystick.rightBumper().whileTrue(turret.runTurretCommand(-1));
+        joystick.rightTrigger().whileTrue(shooter.runShooterCommand());
         drivetrain.registerTelemetry(logger::telemeterize);
 
         // Shoot at Hub while moving
         joystick.rightTrigger()
-            .whileTrue(new ShootWhileMoving(drivetrain, turret, shooter, false));
+            .whileTrue(new ShootWhileMoving(drivetrain, shooter, false));
 
         // Pass to Alliance zone while moving
         joystick.leftTrigger()
-            .whileTrue(new ShootWhileMoving(drivetrain, turret, shooter, true));
+            .whileTrue(new ShootWhileMoving(drivetrain, shooter, true));
 
     }
 

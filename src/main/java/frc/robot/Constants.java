@@ -43,6 +43,11 @@ public class Constants {
 
     public static final class shooterConstants {
 
+        public enum targetLocation {
+            PASS,
+            HUB
+        }
+
         public static final MotorAlignmentValue FLYWHEEL_ALIGNMENT_VALUE = MotorAlignmentValue.Opposed;
 
         // Flywheel Constants
@@ -72,15 +77,16 @@ public class Constants {
 
         // Turret Constants
         public static final int TURRET_DEVICE_ID                        = 0;
-        public static final double TURRET_GEAR_RATIO                    = 50.0;
+        public static final int TURRET_CANCODER_ID                      = 0;
+        public static final double TURRET_MOTOR_TO_ENCODER_RATIO        = 5.0;
+        public static final double TURRET_ENCODER_TO_TURRET_GEAR_RATIO  = 9.0;
+        public static final double TURRET_MOTOR_TO_TURRET_GEAR_RATIO    = TURRET_MOTOR_TO_ENCODER_RATIO * TURRET_ENCODER_TO_TURRET_GEAR_RATIO;
         // Even thought the Turret is designed to have a 360 degree range of motion
         // set min/max points short to avoid roll-over issues
-        public static final double MIN_TURRET_ANGLE                     =   0.500;
-        public static final double MAX_TURRET_ANGLE                     = 359.500;
-        public static final double MIN_TURRET_SOFT_LIMIT                = MIN_TURRET_ANGLE /
-                                                                            360.0 * TURRET_GEAR_RATIO;
-        public static final double MAX_TURRET_SOFT_LIMIT                = MAX_TURRET_ANGLE /
-                                                                            360.0 * TURRET_GEAR_RATIO;
+        public static final double MIN_TURRET_ANGLE                     =-176.000; // 1 tooth from full wrap
+        public static final double MAX_TURRET_ANGLE                     = 176.000;
+        public static final double MIN_TURRET_SOFT_LIMIT                = MIN_TURRET_ANGLE / 360.0;
+        public static final double MAX_TURRET_SOFT_LIMIT                = MAX_TURRET_ANGLE / 360.0;
         public static final double TURRET_KP                            = 0.15;
         public static final double TURRET_KI                            = 0.0;
         public static final double TURRET_KD                            = 0.0;
@@ -96,8 +102,8 @@ public class Constants {
         // Tolerances
         // TODO: Run tests to determine what level of tolerance gives
         // "the best" balance of speed and accuracy
-        public static final double TURRET_PASS_TOLERANCE                = 3.0;
-        public static final double TURRET_HUB_TOLERANCE                 = 1.0;
+        public static final double TURRET_PASS_TOLERANCE                = 10.0;
+        public static final double TURRET_HUB_TOLERANCE                 = 5.0;
         public static final double HOOD_TOLERANCE                       = 0.01;
         public static final double RPM_PASS_TOLERANCE                   = 300;
         public static final double RPM_HUB_TOLERANCE                    = 100;
@@ -106,15 +112,15 @@ public class Constants {
         public static final Transform3d ROBOT_TO_TURRET                 = new Transform3d(1.0, 0.0, 0.44, Rotation3d.kZero);
 
         // Record to easily store parameters for shoot on the move
-        public record SHOOTER_PARAMETERS(double rpm, double hoodAngle, double timeOfFlight){}
+        public record SHOOTER_PARAMETERS(double rpm, double hoodPosition, double timeOfFlight){}
 
         public static InterpolatingTreeMap<Double, SHOOTER_PARAMETERS> HUB_MAP  = new InterpolatingTreeMap<Double, SHOOTER_PARAMETERS>(null, null);
         public static InterpolatingTreeMap<Double, SHOOTER_PARAMETERS> PASS_MAP = new InterpolatingTreeMap<Double, SHOOTER_PARAMETERS>(null, null);
 
         public void ShooterInterpolation() {
             // TODO: Get good values for passing
-            PASS_MAP.put( 1.000, new SHOOTER_PARAMETERS(1500.000, 35.000, 0.800));
-            PASS_MAP.put( 2.000, new SHOOTER_PARAMETERS(2000.000, 35.000, 0.900));
+            PASS_MAP.put( 1.000, new SHOOTER_PARAMETERS(1500.000, 0.000, 0.800));
+            PASS_MAP.put( 2.000, new SHOOTER_PARAMETERS(2000.000, 0.000, 0.900));
             // PASS_MAP.put( 1.000, new SHOOTER_PARAMETERS(RPM, HOOD_ANGLE, TIME_OF_FLIGHT));
             // PASS_MAP.put( 2.000, new SHOOTER_PARAMETERS(RPM, HOOD_ANGLE, TIME_OF_FLIGHT));
             // PASS_MAP.put( 3.000, new SHOOTER_PARAMETERS(RPM, HOOD_ANGLE, TIME_OF_FLIGHT));
@@ -133,8 +139,8 @@ public class Constants {
             // Only values tested for so far: rpm at 7.5 and 13 feet (2.286 and 3.962 meters respectively)
             //                                HOOD_ANGLE AND TIME_OF_FLIGHT NOT TESTED FOR
             // Distance from front of shooter to front of HUB
-            HUB_MAP.put(2.286, new SHOOTER_PARAMETERS(2940.000, 35.000, 1.100));
-            HUB_MAP.put(3.962, new SHOOTER_PARAMETERS(3420.000, 35.000, 1.900));
+            HUB_MAP.put(2.286, new SHOOTER_PARAMETERS(2940.000, 0.000, 1.100));
+            HUB_MAP.put(3.962, new SHOOTER_PARAMETERS(3420.000, 0.000, 1.900));
             // 0.500 Meters ( 1.640 feet)
             // HUB_MAP.put(0.500, new SHOOTER_PARAMETERS(RPM, HOOD_ANGLE, TIME_OF_FLIGHT));
             // 1.000 Meters ( 3.281 feet)
@@ -161,6 +167,14 @@ public class Constants {
             // Just past real max value of shooting inside alliance zone
             // HUB_MAP.put(6.000, new SHOOTER_PARAMETERS(RPM, HOOD_ANGLE, TIME_OF_FLIGHT));
         }
+    }
+
+    public static final class intakeConstants {
+        public static final int INTAKE_ROLLERS_DEVICE_ID    = 10;
+        public static final int INTAKE_PIVOT_DEVICE_ID      = 11;
+
+        public static final double INTAKE_RPM               = 3000;
+        public static final double OUTTAKE_RPM              = -3000;
     }
 
     public static final class DashboardConstants {
