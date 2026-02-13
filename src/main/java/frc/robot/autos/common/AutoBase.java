@@ -100,6 +100,7 @@ public abstract class AutoBase extends SequentialCommandGroup {
 
         // Left Side Paths
         public static final Path DEPOT_TO_LEFT_BUMP_AZ      = new Path("DepotToLeftBumpAZ");
+        public static final Path DEPOT_TO_LEFT_CLIMB        = new Path("DepotToLeftClimb");
         public static final Path LEFT_BUMP_AZ_TO_NZ         = new Path("LeftBumpAZToNZ");
         public static final Path LEFT_BUMP_NZ_TO_AZ         = new Path("LeftBumpNZToAZ");
         public static final Path LEFT_BUMP_NZ_TO_NZ_START   = new Path("LeftBumpNZToNZStart");
