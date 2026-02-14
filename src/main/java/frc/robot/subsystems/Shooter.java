@@ -41,6 +41,7 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.Follower;
 import frc.robot.Constants;
 import frc.robot.Constants.shooterConstants;
+import frc.robot.Constants.shooterConstants.Targets;
 
 
 public class Shooter extends SubsystemBase {
@@ -54,8 +55,11 @@ public class Shooter extends SubsystemBase {
     // private final TalonFX m_motor;
     // //placeholder constants for PID
     private double m_demand;
+    public shooterConstants.Targets targetNumber = shooterConstants.Targets.HUB;
     public double targetRPM = 500;
+    public double targetAngle = 80;
     public double distance = 1.3;
+    public double angle = 1.3;
     // private finasl PIDController m_pidController = new PIDController(shooterConstants.FLYWHEEL_KP, shooterConstants.FLYWHEEL_KI, shooterConstants.FLYWHEEL_KD);
 
 
@@ -87,7 +91,8 @@ public class Shooter extends SubsystemBase {
         SmartDashboard.putNumber("Distance", distance);
         SmartDashboard.putNumber("TargetRPM", targetRPM);
 
-    }public double getHubRPM(double distance) {
+    }
+    public double getHubRPM(double distance) {
         return shooterConstants.HUB_RPM_MAP.get(distance);
     }
 
@@ -101,6 +106,14 @@ public class Shooter extends SubsystemBase {
 
     public double getPassTOF(double distance) {
         return shooterConstants.PASS_TOF_MAP.get(distance);
+    }
+
+    public double getHoodHub(double distance) {
+        return shooterConstants.HOOD_HUB_MAP.get(distance);
+    }
+
+    public double getHoodPass(double distance) {
+        return shooterConstants.HOOD_PASS_MAP.get(distance);
     }
 
 
@@ -307,15 +320,36 @@ public class Shooter extends SubsystemBase {
             }, this);
     }
 
+    public Command changeShootingTarget() {
+        return Commands.runOnce(
+            () -> {
+                switch(this.targetNumber) {
+                    case HUB:
+                        this.targetNumber = Targets.PASS_LEFT;
+                        break;
+                    case PASS_LEFT:
+                        this.targetNumber = Targets.PASS_RIGHT;
+                        break;
+                    case PASS_RIGHT:
+                        this.targetNumber = Targets.HUB;
+                        break;
+                }
+            }
+        )
+    }
+
+
     public void increaseDistance(){
         double newDistance  = this.distance + 0.05;
         this.targetRPM      = getHubRPM(newDistance);
+        this.targetAngle    = getHoodHub(newDistance);
         this.distance       = newDistance;
     }
 
     public void decreaseDistance(){
         double newDistance  = this.distance - 0.05;
         this.targetRPM      = getHubRPM(newDistance);
+        this.targetAngle    = getHoodHub(newDistance);
         this.distance       = newDistance;
     }
 

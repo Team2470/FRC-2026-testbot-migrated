@@ -93,7 +93,7 @@ public class RobotContainer {
         // reset the field-centric heading on left bumper press
         // joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
         joystick.leftBumper().whileTrue(turret.runTurretCommand(1));
-        joystick.rightBumper().whileTrue(turret.runTurretCommand(-1));
+        joystick.rightBumper().whileTrue(shooter.changeShootingTarget());
         joystick.rightTrigger().whileTrue(shooter.runShooterCommand());
         drivetrain.registerTelemetry(logger::telemeterize);
     }
