@@ -335,22 +335,47 @@ public class Shooter extends SubsystemBase {
                         break;
                 }
             }
-        )
+        , this);
     }
 
 
     public void increaseDistance(){
         double newDistance  = this.distance + 0.05;
-        this.targetRPM      = getHubRPM(newDistance);
-        this.targetAngle    = getHoodHub(newDistance);
+        switch(this.targetNumber) {
+            case HUB:
+                this.targetRPM      = getHubRPM(newDistance);
+                this.targetAngle    = getHoodHub(newDistance);
+                break;
+            case PASS_LEFT:
+                this.targetAngle    = getPassRPM(newDistance);
+                this.targetAngle    = getHoodPass(newDistance);
+                break;
+            case PASS_RIGHT:
+                this.targetAngle    = getPassRPM(newDistance);
+                this.targetAngle    = getHoodPass(newDistance);
+                break;
+        }
         this.distance       = newDistance;
     }
 
     public void decreaseDistance(){
         double newDistance  = this.distance - 0.05;
-        this.targetRPM      = getHubRPM(newDistance);
-        this.targetAngle    = getHoodHub(newDistance);
-        this.distance       = newDistance;
+                switch(this.targetNumber) {
+            case HUB:
+                this.targetRPM      = getHubRPM(newDistance);
+                this.targetAngle    = getHoodHub(newDistance);
+                break;
+            case PASS_LEFT:
+                this.targetAngle    = getPassRPM(newDistance);
+                this.targetAngle    = getHoodPass(newDistance);
+                break;
+            case PASS_RIGHT:
+                this.targetAngle    = getPassRPM(newDistance);
+                this.targetAngle    = getHoodPass(newDistance);
+                break;
+        }
     }
+
+
 
 }
