@@ -40,26 +40,46 @@ public class VisionSubsystem extends SubsystemBase {
      * Logic to determine how much we trust the Limelight frame
      */
     private double calculateStdDev(LimelightHelpers.PoseEstimate estimate) {
-        double stdDev = 0.1; // Set base trust
+        double tagStdDev;
 
-        if (estimate.tagCount == 1){
-            stdDev *= 2.0; // High uncertainty for single tag
-        } else if (estimate.tagCount == 2) {
-            stdDev *= 0.7; // Moderate uncertainty with 2 tags
-        } else if (estimate.tagCount == 3) {
-            stdDev *= 0.3; // Low uncertainty with 3 tags
-        } else if (estimate.tagCount >= 4) {
-            stdDev *= 0.1; // Super low uncertainty with 4+ tags
-        } else {
-            stdDev *= 10.0; // Super high uncertainty with 0 tags
+        switch(estimate.tagCount){
+            // case 0 shouldn't happen
+            // Only call calculateStdDev when estimate.tagCount > 0
+            case 0:
+                tagStdDev = 100;    // Super High uncertainty with no tags
+                return tagStdDev;   // No tags, so no estimate.avgTagDist
+            case 1:
+                tagStdDev = 2.0;    // High uncertainty for single tag
+                break;
+            case 2:
+                tagStdDev = 0.5;    // Moderate uncertainty with 2 tags
+                break;
+            case 3:
+                tagStdDev = 0.1;    // Low uncertainty with 3 tags
+                break;
+            case 4:
+                tagStdDev = 0.001;  // Super Low uncertainty with 4 tags
+                break;
+            default:
+                tagStdDev = 0.0001; // Super-Duper-Low uncertainty with 5+ tags
+                break;
         }
 
-        // Distance factor increases exponetially with distance
+        // Distance factor increases exponentially with distance
         // f: distance factor
         // d: distance
-        // k: coefficient (0.01 for now)
+        // k: coefficient (0.1 for now)
         // f = d^2 * k
-        double distanceMultiplier = Math.pow(estimate.avgTagDist,2) * 0.01;
-        return stdDev + distanceMultiplier;
+        // 1 meter average tag distance:    f =  1^2 * .1 =  0.1
+        // 5 meter average tag distance:    f =  5^2 * .1 =  2.5
+        // 10 meter average tag distance:   f = 10^2 * .1 = 10.0
+        double distanceMultiplier = Math.pow(estimate.avgTagDist,2) * 0.1;
+
+        // stdDev to use will be the product of the tag dev * distance dev
+        // Examples:
+        // 1t at  1m: 2.0 * 0.1 = 0.2
+        // 3t at  3m: 0.1 * 0.9 = 0.9
+        // 5t at 10m: 0.0001 * 10.0 = 0.001
+        return tagStdDev * distanceMultiplier;
     }
 }
