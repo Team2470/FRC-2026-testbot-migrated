@@ -29,10 +29,10 @@ public class Constants {
         // Target Locations
         public static final Translation2d BLUE_HUB_LOCATION             = new Translation2d(4.600, 4.025);
         public static final Translation2d RED_HUB_LOCATION              = new Translation2d(12.000, 4.025);
-        public static final Translation2d BLUE_RIGHT_PASS_LOCATION      = new Translation2d(3.750, 2.000);
-        public static final Translation2d BLUE_LEFT_PASS_LOCATION       = new Translation2d(3.750, 6.000);
-        public static final Translation2d RED_LEFT_PASS_LOCATION        = new Translation2d(12.750, 2.000);
-        public static final Translation2d RED_RIGHT_PASS_LOCATION       = new Translation2d(12.750, 6.000);
+        public static final Translation2d BLUE_RIGHT_PASS_LOCATION      = new Translation2d(2.500, 2.000);
+        public static final Translation2d BLUE_LEFT_PASS_LOCATION       = new Translation2d(2.500, 6.000);
+        public static final Translation2d RED_LEFT_PASS_LOCATION        = new Translation2d(14.500, 2.000);
+        public static final Translation2d RED_RIGHT_PASS_LOCATION       = new Translation2d(14.500, 6.000);
         public static final Translation2d HUB_LOCATION                  = isBlueAlliance() ? BLUE_HUB_LOCATION :
                                                                                                 RED_HUB_LOCATION;
         public static final Translation2d PASS_LEFT_LOCATION            = isBlueAlliance() ? BLUE_LEFT_PASS_LOCATION :

@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -45,8 +46,9 @@ public class RobotContainer {
 
     private final CommandXboxController joystick = new CommandXboxController(0);
 
-    private QuestNav questNav = new QuestNav();
-    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain((pose) -> questNav.resetPose(pose));
+    // private QuestNav questNav = new QuestNav();
+    // public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain((pose) -> questNav.resetPose(pose));
+    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     public final ShooterSubsystem shooter = new ShooterSubsystem();
     public final IntakeSubsystem intake = new IntakeSubsystem();
 
@@ -56,7 +58,15 @@ public class RobotContainer {
         NetworkTableInstance.getDefault().getStructTopic("questPose", Pose2d.struct).publish();
     private VisionApriltagSubsystem visionApriltagSubsystem;
 
+    private final SendableChooser<Pose2d> calibrationChooser = new SendableChooser<>();
+
     public RobotContainer() {
+        // Define a few "Gold Standard" spots on your carpet
+        calibrationChooser.setDefaultOption("Blue Hub 1m out", new Pose2d(3.02, 4.03, Rotation2d.fromDegrees(0)));
+        calibrationChooser.addOption("Red Hub 1m out", new Pose2d(13.51, 4.03, Rotation2d.fromDegrees(180)));
+        SmartDashboard.putData("Calibration Points", calibrationChooser);
+
+
         configureBindings();
     }
 
@@ -130,25 +140,25 @@ public class RobotContainer {
         // in view in starting position
         updateVisionPose();
         Pose2d startPose = extractLimelightPose();
-        questNav.resetPose(startPose);
+        // questNav.resetPose(startPose);
     }
 
     public void periodic () {
-        questNav.cleanUpQuestNavMessages();
+        // questNav.cleanUpQuestNavMessages();
         posePublisher.set(drivetrain.getPose());
         updateVisionPose();
-        questPosePublisher.set(questNav.getRobotPose());
+        // questPosePublisher.set(questNav.getRobotPose());
     }
 
     public void updateVisionPose() {
-        if (questNav.isConnected()) {
-            questNav.updateAverageRobotPose();
+        // if (questNav.isConnected()) {
+            // questNav.updateAverageRobotPose();
             //   drivetrain.addVisionMeasurement(
             //       questNav.getRobotPose(), VecBuilder.fill(0.0, 0.0, 9999999.0));
-            drivetrain.addVisionMeasurement(
-                questNav.getAverageRobotPose(), VecBuilder.fill(0.0, 0.0, 0.0));
-            return;
-        }
+            // drivetrain.addVisionMeasurement(
+                // questNav.getAverageRobotPose(), VecBuilder.fill(0.0, 0.0, 0.0));
+            // return;
+        // }
 
         // LimelightHelpers.PoseEstimate limelightMeasurement =
         // visionApriltagSubsystem.getPoseEstimate();
@@ -158,8 +168,7 @@ public class RobotContainer {
         //       limelightMeasurement.pose,
         //       limelightMeasurement.timestampSeconds,
         //       VecBuilder.fill(.6, .6, 9999999));
-        // }
-    }
+        }
 
     private Pose2d extractLimelightPose() {
         LimelightHelpers.PoseEstimate limelightMeasurement = visionApriltagSubsystem.getPoseEstimate();

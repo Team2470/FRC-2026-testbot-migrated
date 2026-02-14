@@ -213,6 +213,20 @@ public class TunerConstants {
         );
     }
 
+    public static CommandSwerveDrivetrain createDrivetrain() {
+        return new CommandSwerveDrivetrain(
+            null,
+            DrivetrainConstants,
+            0,
+            VecBuilder.fill(0.6, 0.6, 0.6),
+            VecBuilder.fill(0.05, 0.05, 0.05),
+            FrontLeft,
+            FrontRight,
+            BackLeft,
+            BackRight
+        );
+    }
+
 
     /**
      * Swerve Drive class utilizing CTR Electronics' Phoenix 6 API with the selected device types.
