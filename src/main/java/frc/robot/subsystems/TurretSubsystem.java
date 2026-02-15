@@ -1,14 +1,23 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Rotations;
+
+import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DutyCycle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -20,9 +29,11 @@ public class TurretSubsystem extends SubsystemBase {
     private final CANcoder turretEncoder                = new CANcoder(shooterConstants.TURRET_CANCODER_ID);
     private final MotionMagicVoltage positionRequest    = new MotionMagicVoltage(0);
 
+    private StatusSignal<AngularVelocity> turretYawVelocity = m_turretMotor.getVelocity();
+    private StatusSignal<Angle> turretYawPosition           = m_turretMotor.getPosition();
     public final double toleranceDegrees = 5.0;
 
-    public Rotation2d targetAngle = Rotation2d.fromDegrees(0);
+    public double targetYaw = Units.radiansToDegrees(0);
 
     // Adjust based on your physical gear ratio (e.g., 100:1)
     // private final double GEAR_RATIO = shooterConstants.TURRET_GEAR_RATIO;
@@ -35,6 +46,8 @@ public class TurretSubsystem extends SubsystemBase {
         config.Slot0.kV                                         = shooterConstants.TURRET_KV;
         config.MotionMagic.MotionMagicCruiseVelocity            = shooterConstants.TURRET_MOTION_MAGIC_CRUISE_VELOCITY;
         config.MotionMagic.MotionMagicAcceleration              = shooterConstants.TURRET_MOTION_MAGIC_ACCELERACTIION;
+
+        config.MotorOutput.NeutralMode                          = NeutralModeValue.Brake;
 
         config.Feedback.FeedbackRemoteSensorID                  = turretEncoder.getDeviceID();
         config.Feedback.FeedbackSensorSource                    = FeedbackSensorSourceValue.RemoteCANcoder;
@@ -50,18 +63,11 @@ public class TurretSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        double currentAngle = getAngle();
-        boolean onTarget = isOnTarget(targetAngle, toleranceDegrees);
-
-        SmartDashboard.putNumber("Turret/Current Angle", currentAngle);
-        SmartDashboard.putNumber("Turret/Target Angle", targetAngle.getDegrees());
-        SmartDashboard.putBoolean("Turret/At Target", onTarget);
-
         updateMotorControl();
     }
 
     public void updateMotorControl() {
-        double targetRotations = targetAngle.getDegrees();
+        double targetRotations = targetYaw;
         setAngle(targetRotations);
     }
 
@@ -79,11 +85,22 @@ public class TurretSubsystem extends SubsystemBase {
         m_turretMotor.setControl(positionRequest.withPosition(turretRotations));
     }
 
-    public double getAngle(){
-        return m_turretMotor.getPosition().getValueAsDouble() * 360.0;
+    public boolean isOnTarget(double toleranceDegrees) {
+        BaseStatusSignal.refreshAll(turretYawPosition, turretYawVelocity);
+        Angle currentYaw = BaseStatusSignal.getLatencyCompensatedValue(turretYawPosition, turretYawVelocity);
+        return MathUtil.isNear(targetYaw, currentYaw.in(Degrees), toleranceDegrees);
     }
 
-    public boolean isOnTarget(Rotation2d target, double toleranceDegrees) {
-        return Math.abs(getAngle() - target.getDegrees()) <= Math.abs(toleranceDegrees);
+    public Angle getYaw(){
+        BaseStatusSignal.refreshAll(turretYawPosition, turretYawVelocity);
+        return BaseStatusSignal.getLatencyCompensatedValue(turretYawPosition, turretYawVelocity);
+    }
+
+    public AngularVelocity getYawVelocity() {
+        return turretYawVelocity.refresh().getValue();
+    }
+
+    public void setYawAngle(Angle targetAngle) {
+        m_turretMotor.setControl(positionRequest.withPosition((targetAngle)));
     }
 }

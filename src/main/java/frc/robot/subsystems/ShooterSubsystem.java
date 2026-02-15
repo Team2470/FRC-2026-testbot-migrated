@@ -1,11 +1,17 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Rotations;
+
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -17,8 +23,8 @@ public class ShooterSubsystem extends SubsystemBase {
     private final TalonFX flywheelMotorOne              = new TalonFX(shooterConstants.FLYWHEEL_1_DEVICE_ID);
     private final TalonFX flywheelMotorTwo              = new TalonFX(shooterConstants.FLYWHEEL_2_DEVICE_ID);
     private final TalonFX feederMotor                   = new TalonFX(shooterConstants.FEEDER_DEVICE_ID);
-    private final Hood hood                             = new Hood();
-    private final TurretSubsystem turret                = new TurretSubsystem();
+    public  final Hood hood                             = new Hood();
+    public  final TurretSubsystem turret                = new TurretSubsystem();
     private final VelocityVoltage m_velocityRequest     = new VelocityVoltage(0);
     public double targetRPM;
 
@@ -52,8 +58,8 @@ public class ShooterSubsystem extends SubsystemBase {
         hood.setPosition(position);
     }
 
-    public void setTurretAngle(Rotation2d degrees) {
-        turret.targetAngle = degrees;
+    public void setTurretAngle(double degrees) {
+        turret.targetYaw = degrees;
     }
 
     public void setRPM(double rpm) {
@@ -74,8 +80,8 @@ public class ShooterSubsystem extends SubsystemBase {
         return hood.isPositionWithinTolerance();
     }
 
-    public boolean isTurretOnTarget(Rotation2d target, double toleranceDegrees) {
-        return turret.isOnTarget(target, toleranceDegrees);
+    public boolean isTurretOnTarget(double toleranceDegrees) {
+        return turret.isOnTarget(toleranceDegrees);
     }
 
     // Input: RPM of the main flywheel
@@ -98,6 +104,17 @@ public class ShooterSubsystem extends SubsystemBase {
                 this.setRPM(targetRPM);
             },
             () -> { this.setRPM(0);}, this);
+    }
+
+    public static Translation2d getShooterTranslation(Pose2d robotPose) {
+        return robotPose.getTranslation().plus(shooterConstants.ROBOT_TO_TURRET.rotateBy(robotPose.getRotation()));
+    }
+
+    public static Translation2d getTurretTranslation(Pose2d robotPose, Angle turretYaw) {
+        var turretCenter        = getShooterTranslation(robotPose);
+        var turretFieldRotation = robotPose.getRotation().plus(Rotation2d.fromRotations(turretYaw.in(Rotations)));
+        var turretToShot        = new Translation2d(shooterConstants.TURRET_RADIUS.in(Meters), turretFieldRotation);
+        return turretCenter.plus(turretToShot);
     }
 
 }

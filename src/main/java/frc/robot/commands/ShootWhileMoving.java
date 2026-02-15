@@ -1,9 +1,16 @@
 package frc.robot.commands;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.fieldConstants;
 import frc.robot.Constants.shooterConstants;
@@ -25,6 +32,8 @@ public class ShootWhileMoving extends Command {
     public double           robotToPassRight;
     public Translation2d    target_location = new Translation2d(0.0, 0.0);
     public Translation2d    robotToGoal     = new Translation2d(0.0, 0.0);
+    // Reusable object to prevent reallocation (to reduce memory pressure)
+    private final MutAngle turretYawTarget = Rotations.mutable(0);
 
 
     public ShootWhileMoving(CommandSwerveDrivetrain drive,
@@ -61,37 +70,48 @@ public class ShootWhileMoving extends Command {
         robotToGoal             = target_location.minus(robotPose.getTranslation());
         double physicalDistance = robotToGoal.getNorm();
         double timeOfFlight     = isPassing ? m_shooter.getPassParameters(physicalDistance).timeOfFlight() :
-                                                m_shooter.getHubParameters(physicalDistance).timeOfFlight();
+        m_shooter.getHubParameters(physicalDistance).timeOfFlight();
 
-        // Get robot speed for virtual goal math
         ChassisSpeeds fieldSpeeds       = m_drive.getFieldRelativeSpeeds();
+        var curretTurretYaw = m_shooter.turret.getYaw();
+        var turretTranslation   = m_shooter.getTurretTranslation(robotPose, curretTurretYaw);
+        var vRobot = new Translation2d(fieldSpeeds.vxMetersPerSecond, fieldSpeeds.vyMetersPerSecond);
+        var omegaRobot = fieldSpeeds.omegaRadiansPerSecond;
+        var turretVelocity = m_shooter.turret.getYawVelocity().in(RadiansPerSecond);
+        var totalOmega = omegaRobot + turretVelocity;
 
-        // The "Virtual Goal" accounts for robot velocity during ball flight
-        Translation2d virtualGoal       = target_location.minus(
-            new Translation2d(fieldSpeeds.vxMetersPerSecond * timeOfFlight,
-                              fieldSpeeds.vyMetersPerSecond * timeOfFlight)
-        );
+        var robotToShot = turretTranslation.minus(robotPose.getTranslation());
+        var vTanTotal   = new Translation2d(-totalOmega * robotToShot.getY(), totalOmega * robotToShot.getX());
 
-        // Vector match to include robot velocity
-        Translation2d robotToVirtual    = virtualGoal.minus(robotPose.getTranslation());
-        double virtualDistance          = robotToVirtual.getNorm();
-        SHOOTER_PARAMETERS shotParams   = isPassing ? m_shooter.getPassParameters(virtualDistance) :
-                                                        m_shooter.getHubParameters(virtualDistance);
-        Rotation2d fieldRelativeTarget  = robotToVirtual.getAngle();
-        Rotation2d robotRotation        = robotPose.getRotation();
-        Rotation2d turretTarget         = fieldRelativeTarget.minus(robotRotation);
-        double targetRPM                = shotParams.rpm();
-        double targetHood               = shotParams.hoodPosition();
+        var effectiveShooterVelocity = vRobot.plus(vTanTotal);
 
-        // Set Subsystem Targets
-        m_shooter.setTurretAngle(turretTarget);
-        m_shooter.setRPM(targetRPM);
-        m_shooter.setHoodPosition(targetHood);
+        var predictedTargetTranslation = target_location;
+
+        SHOOTER_PARAMETERS shotParameters;
+
+        // Iterate 4 times to converge on the intersection of trajectory and target
+        for (int i = 0; i < 4; i++) {
+            var dist = predictedTargetTranslation.getDistance(turretTranslation);
+            shotParameters = isPassing ? m_shooter.getPassParameters(dist) :
+                                            m_shooter.getHubParameters(dist);
+            var timeUntilScored = shotParameters.timeOfFlight();
+            var targetPredictedOffset = effectiveShooterVelocity.times(timeUntilScored);
+            predictedTargetTranslation = target_location.minus(targetPredictedOffset);
+        }
+
+        shotParameters = isPassing ? m_shooter.getPassParameters(predictedTargetTranslation.getDistance(turretTranslation)) :
+                                        m_shooter.getHubParameters(predictedTargetTranslation.getDistance(turretTranslation));
+
+        var angleToTarget = predictedTargetTranslation.minus(turretTranslation).getAngle();
+        turretYawTarget.mut_replace(angleToTarget.minus(robotPose.getRotation()).getRotations(), Rotations);
+        m_shooter.turret.setYawAngle(turretYawTarget);
+        m_shooter.setRPM(shotParameters.rpm());
+        m_shooter.setHoodPosition(shotParameters.hoodPosition());
 
         // Once Turret and shooter are at the correct set points
         // Unleash fuel into turret
-        if (m_shooter.isTurretOnTarget(turretTarget, turretToleranceDegrees)
-            && m_shooter.isAtSpeed(targetRPM, flywheelToleranceRPM)
+        if (m_shooter.isTurretOnTarget(turretToleranceDegrees)
+            && m_shooter.isAtSpeed(shotParameters.rpm(), flywheelToleranceRPM)
             && m_shooter.isHoodOnTarget()) {
             m_shooter.runFeeder(shooterConstants.FEEDER_RUN);
         }

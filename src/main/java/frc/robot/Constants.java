@@ -1,5 +1,6 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Millimeters;
 import static edu.wpi.first.units.Units.Second;
 
@@ -9,6 +10,8 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
+import edu.wpi.first.math.interpolation.Interpolator;
+import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -109,15 +112,30 @@ public class Constants {
         public static final double RPM_HUB_TOLERANCE                    = 100;
 
         // TODO: grab coordinates of Center of Turret compared to our robot's origin point (typically in the center of our bellypan)
-        public static final Transform3d ROBOT_TO_TURRET                 = new Transform3d(1.0, 0.0, 0.44, Rotation3d.kZero);
+        public static final Translation2d ROBOT_TO_TURRET               = new Translation2d(-0.5, 0);
+        public static final Distance TURRET_RADIUS                      = Inches.of(7);
 
         // Record to easily store parameters for shoot on the move
         public record SHOOTER_PARAMETERS(double rpm, double hoodPosition, double timeOfFlight){}
 
-        public static InterpolatingTreeMap<Double, SHOOTER_PARAMETERS> HUB_MAP  = new InterpolatingTreeMap<Double, SHOOTER_PARAMETERS>(null, null);
-        public static InterpolatingTreeMap<Double, SHOOTER_PARAMETERS> PASS_MAP = new InterpolatingTreeMap<Double, SHOOTER_PARAMETERS>(null, null);
+        public static final Interpolator<SHOOTER_PARAMETERS> SHOOTER_PARAM_INTERPOLATOR =
+            (start, end, t) -> {
+                double interpRPM = start.rpm() + (end.rpm() - start.rpm()) * t;
+                double interpHood = start.hoodPosition() + (end.hoodPosition() - start.hoodPosition()) * t;
+                double interpTime = start.timeOfFlight() + (end.timeOfFlight() - start.timeOfFlight()) * t;
+                return new SHOOTER_PARAMETERS(interpRPM, interpHood, interpTime);
+            };
 
-        public void ShooterInterpolation() {
+        public static InterpolatingTreeMap<Double, SHOOTER_PARAMETERS> HUB_MAP  = new InterpolatingTreeMap
+                                                                                        <Double, SHOOTER_PARAMETERS>
+                                                                                        (InverseInterpolator.forDouble(),
+                                                                                        SHOOTER_PARAM_INTERPOLATOR);
+        public static InterpolatingTreeMap<Double, SHOOTER_PARAMETERS> PASS_MAP = new InterpolatingTreeMap
+                                                                                        <Double, SHOOTER_PARAMETERS>
+                                                                                        (InverseInterpolator.forDouble(),
+                                                                                        SHOOTER_PARAM_INTERPOLATOR);
+
+        static {
             // TODO: Get good values for passing
             PASS_MAP.put( 1.000, new SHOOTER_PARAMETERS(1500.000, 0.000, 0.800));
             PASS_MAP.put( 2.000, new SHOOTER_PARAMETERS(2000.000, 0.000, 0.900));
