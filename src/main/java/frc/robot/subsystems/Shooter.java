@@ -58,7 +58,7 @@ public class Shooter extends SubsystemBase {
     public shooterConstants.Targets targetNumber = shooterConstants.Targets.HUB;
     public double targetRPM = 500;
     public double targetAngle = 80;
-    public double distance = 1.3;
+    public double distance = 1.219;
     public double angle = 1.3;
     // private finasl PIDController m_pidController = new PIDController(shooterConstants.FLYWHEEL_KP, shooterConstants.FLYWHEEL_KI, shooterConstants.FLYWHEEL_KD);
 
@@ -87,11 +87,14 @@ public class Shooter extends SubsystemBase {
         m_topMotor_2.getConfigurator().apply(config);
         m_topMotor_2.optimizeBusUtilization();
         m_topMotor_2.setControl(new Follower(m_topMotor_1.getDeviceID(), shooterConstants.FLYWHEEL_ALIGNMENT_VALUE));
+    }
 
+    public void periodic(){
         SmartDashboard.putNumber("Distance", distance);
         SmartDashboard.putNumber("TargetRPM", targetRPM);
-
+        SmartDashboard.putString("targetNumber", targetNumber.toString());
     }
+
     public double getHubRPM(double distance) {
         return shooterConstants.HUB_RPM_MAP.get(distance);
     }

@@ -51,7 +51,7 @@ public class Constants {
         public static InterpolatingDoubleTreeMap PASS_TOF_MAP   = new InterpolatingDoubleTreeMap();
         public static InterpolatingDoubleTreeMap HUB_TOF_MAP    = new InterpolatingDoubleTreeMap();
 
-         public void ShooterInterpolation() {
+        static {
             // TODO: Actually test for these values.
             // Initial values are based on using desmos Trajectory Calculator
             // And do not reflect real-world-values
